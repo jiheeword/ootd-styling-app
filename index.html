@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>OOTD 오늘의 코디 | 나만의 맞춤 패션 & AI 스타일링</title>
+  <meta name="description" content="오늘의집 스타일 패션 플랫폼 - 일상 코디 자랑, 착장 정보 태그 공유, AI 퍼스널컬러/체형 진단 및 스마트 가격할인 알림 커뮤니티">
+  
+  <!-- Fonts: Pretendard & Montserrat -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css?v=20260910_05">
+</head>
+<body class="light-theme">
+
+  <!-- 1. PC/태블릿 상단 글로벌 헤더 -->
+  <header class="main-header">
+    <div class="header-inner">
+      <!-- 좌측 로고 -->
+      <a href="#" class="brand-logo" onclick="switchNav('feed')">
+        <div class="logo-icon-box">
+          <i data-lucide="hanger"></i>
+        </div>
+        <div class="logo-text-box">
+          <span class="logo-title">OOTD 오늘의 코디</span>
+          <span class="logo-tag">DAILY FASHION</span>
+        </div>
+      </a>
+
+      <!-- 중앙 메인 네비게이션 -->
+      <nav class="nav-menu">
+        <button class="nav-item active" data-target="feed" onclick="switchNav('feed')">
+          <span>패션 자랑 (OOTD)</span>
+        </button>
+        <button class="nav-item" data-target="ai-counseling" onclick="switchNav('ai-counseling')">
+          <span class="badge-ai">AI</span>
+          <span>퍼스널 진단·쇼룸</span>
+        </button>
+        <button class="nav-item" data-target="community" onclick="switchNav('community')">
+          <span>스타일 커뮤니티</span>
+        </button>
+      </nav>
+
+      <!-- 우측 검색 및 액션 버튼들 -->
+      <div class="header-actions">
+        <!-- 검색창 (PC) -->
+        <div class="search-bar-wrap">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" id="global-search" placeholder="체형, 톤, 브랜드, 코디 검색..." />
+        </div>
+
+        <!-- 화면 모드 전환 (PC 뷰 vs 모바일 뷰) -->
+        <div class="view-mode-toggle-group">
+          <button type="button" class="view-mode-btn active" id="btn-view-pc" onclick="setViewMode('pc')" title="넓은 PC 화면으로 보기">
+            <i data-lucide="monitor"></i>
+            <span>PC 뷰</span>
+          </button>
+          <button type="button" class="view-mode-btn" id="btn-view-mobile" onclick="setViewMode('mobile')" title="스마트폰 화면으로 보기">
+            <i data-lucide="smartphone"></i>
+            <span>모바일 뷰</span>
+          </button>
+        </div>
+
+        <!-- 알림/장바구니 버튼 -->
+        <button class="icon-circle-btn" id="cart-drawer-open-btn" title="스마트 장바구니">
+          <i data-lucide="shopping-bag"></i>
+          <span id="cart-badge" class="header-badge">0</span>
+        </button>
+
+        <!-- 글쓰기(내 패션 자랑하기) 버튼 -->
+        <button class="write-post-btn" id="open-upload-modal-btn">
+          <i data-lucide="plus"></i>
+          <span>코디 자랑하기</span>
+        </button>
+
+        <!-- 로그인/프로필 영역 -->
+        <div class="auth-box" id="auth-box">
+          <button class="login-trigger-btn" id="open-login-btn">로그인 / 회원가입</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 토스트 알림 컨테이너 -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- 메인 컨테이너 -->
+  <main class="page-body">
+
+    <!-- =========================================================================
+         VIEW 1: 패션 자랑 (OOTD 피드 - 오늘의집 인테리어 자랑 스타일)
+         ========================================================================= -->
+    <section id="view-feed" class="content-view active">
+      
+      <!-- 상단 스토리/베스트 드레서 롤링 바 -->
+      <div class="story-scroll-wrap">
+        <div class="story-container">
+          <div class="story-item my-story" id="story-add-trigger">
+            <div class="story-avatar add-icon-avatar">
+              <i data-lucide="camera"></i>
+            </div>
+            <span class="story-name">내 코디 등록</span>
+          </div>
+          <!-- AI 진단 결과서 퀵 바로보기 버튼 -->
+          <div class="story-item ai-report-story" onclick="openDiagnosisResultModal()" title="내 AI 퍼스널 진단서 팝업 열기">
+            <div class="story-avatar ai-report-avatar">
+              <i data-lucide="sparkles"></i>
+            </div>
+            <span class="story-name" style="color:var(--primary); font-weight:800;">내 AI 진단서</span>
+          </div>
+          <div class="story-item active" onclick="filterByTone('all')">
+            <div class="story-avatar">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="유저">
+            </div>
+            <span class="story-name">실시간 전체</span>
+          </div>
+          <div class="story-item" onclick="filterByTone('여름쿨톤')">
+            <div class="story-avatar tone-cool">
+              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80" alt="유저">
+            </div>
+            <span class="story-name">여름 쿨톤</span>
+          </div>
+          <div class="story-item" onclick="filterByTone('봄웜톤')">
+            <div class="story-avatar tone-warm">
+              <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=150&q=80" alt="유저">
+            </div>
+            <span class="story-name">봄 웜톤</span>
+          </div>
+          <div class="story-item" onclick="filterByTone('웨이브체형')">
+            <div class="story-avatar">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="유저">
+            </div>
+            <span class="story-name">웨이브 체형</span>
+          </div>
+          <div class="story-item" onclick="filterByTone('출근룩')">
+            <div class="story-avatar">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80" alt="유저">
+            </div>
+            <span class="story-name">오피스 출근룩</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 카테고리 필터 칩 바 (오늘의집 스타일 탭 필터) -->
+      <div class="filter-sticky-bar">
+        <div class="filter-chips-list">
+          <button class="filter-chip active" data-filter="all" onclick="applyFeedFilter('all', this)">전체</button>
+          <button class="filter-chip" data-filter="출근룩" onclick="applyFeedFilter('출근룩', this)">💼 직장인 출근룩</button>
+          <button class="filter-chip" data-filter="데이트룩" onclick="applyFeedFilter('데이트룩', this)">☕ 데이트·주말룩</button>
+          <button class="filter-chip" data-filter="여름쿨톤" onclick="applyFeedFilter('여름쿨톤', this)">❄️ 여름 쿨톤</button>
+          <button class="filter-chip" data-filter="가을웜톤" onclick="applyFeedFilter('가을웜톤', this)">🍂 가을 웜톤</button>
+          <button class="filter-chip" data-filter="웨이브체형" onclick="applyFeedFilter('웨이브체형', this)">👗 하체보완 웨이브</button>
+          <button class="filter-chip" data-filter="스트레이트" onclick="applyFeedFilter('스트레이트', this)">📏 탄탄 스트레이트</button>
+          <button class="filter-chip" data-filter="주얼리포인트" onclick="applyFeedFilter('주얼리포인트', this)">💎 주얼리 포인트</button>
+        </div>
+      </div>
+
+      <!-- OOTD 피드 카드 그리드 (오늘의집 인테리어 자랑 스타일) -->
+      <div class="feed-grid-container" id="feed-grid">
+        <!-- JS로 동적 렌더링 -->
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         VIEW 2: AI 퍼스널 카운슬링 & 룩북 쇼룸 (스마트 알림)
+         ========================================================================= -->
+    <section id="view-ai-counseling" class="content-view" style="display: none;">
+      
+      <!-- AI 헤더 배너 -->
+      <div class="ai-hero-banner">
+        <div class="ai-banner-badge">L'ATELIER AI COUNSELOR</div>
+        <h2>내 체형과 피부톤에 딱 맞는 옷, <span class="highlight-blue">AI가 3분 만에 찾아드려요</span></h2>
+        <p>사진 촬영이 부담스럽다면 음성이나 대화로만 질문에 답해보세요. 퍼스널 컬러와 골격, 넥라인을 정밀 계산하여 인생핏을 찾아드립니다.</p>
+        
+        <div class="ai-mode-toggle-pills">
+          <button class="mode-pill active" id="pill-chat-mode" onclick="setAiMode('chat')">
+            <i data-lucide="message-square"></i> ⚡ 3분 대화·음성 진단
+          </button>
+          <button class="mode-pill" id="pill-photo-mode" onclick="setAiMode('photo')">
+            <i data-lucide="camera"></i> 📸 사진 정밀 스캔 모드
+          </button>
+          <button class="mode-pill pill-result-highlight" id="pill-result-btn" onclick="openDiagnosisResultModal()">
+            <i data-lucide="file-check-2"></i> 📋 내 AI 진단 결과서 바로보기
+          </button>
+        </div>
+      </div>
+
+      <!-- 대화형 스튜디오 카드 -->
+      <div class="ai-studio-wrapper" id="ai-chat-wrapper">
+        <div class="ai-chat-card">
+          <div class="chat-header">
+            <div class="chat-title">
+              <span class="bot-status-dot"></span>
+              <strong>AI 패션 카운슬러 릴리</strong>
+              <span class="chat-sub">전문 컬러리스트 & 스타일리스트</span>
+            </div>
+            <button class="reset-chat-btn" onclick="resetAiChat()">다시 진단하기</button>
+          </div>
+
+          <!-- 대화 메시지 창 -->
+          <div class="chat-msg-area" id="ai-chat-messages">
+            <!-- JS 렌더링 -->
+          </div>
+
+          <!-- 선택지 및 입력창 -->
+          <div class="chat-input-container">
+            <div class="quick-chips-box" id="ai-quick-chips">
+              <!-- 선택지 칩 동적 생성 -->
+            </div>
+            
+            <div class="chat-input-bar">
+              <button id="ai-mic-btn" class="mic-btn" title="음성으로 말하기 (바이브 보이스)">
+                <i data-lucide="mic"></i>
+              </button>
+              <input type="text" id="ai-user-input" placeholder="직접 고민을 말씀하시거나 보기를 클릭하세요..." />
+              <button id="ai-send-btn" class="send-btn">
+                <i data-lucide="arrow-up"></i>
+              </button>
+            </div>
+            <div class="voice-alert-bar" id="voice-indicator" style="display: none;">
+              <span class="pulse-ring"></span> 목소리를 듣고 있어요... 말씀해 주세요.
+            </div>
+          </div>
+        </div>
+
+        <!-- 실시간 모핑 아바타 뷰어 (오른쪽 패널) -->
+        <div class="ai-avatar-card">
+          <div class="avatar-card-header">
+            <span class="badge-tag">실시간 체형·톤 시각화</span>
+            <h4>내 몸에 맞춘 실루엣</h4>
+            <p>답변에 따라 피부 톤과 골격 라인이 즉시 변합니다.</p>
+          </div>
+
+          <div class="svg-avatar-box">
+            <svg id="live-avatar-svg" viewBox="0 0 200 340" class="morph-svg">
+              <defs>
+                <radialGradient id="lightSkinGlow" cx="50%" cy="40%" r="60%">
+                  <stop id="skin-stop-1" offset="0%" stop-color="#fff1eb" />
+                  <stop id="skin-stop-2" offset="100%" stop-color="#fed7cc" />
+                </radialGradient>
+              </defs>
+              <!-- 얼굴/머리 -->
+              <ellipse id="morph-head" cx="100" cy="50" rx="22" ry="26" fill="url(#lightSkinGlow)" />
+              <path d="M76,50 C76,26 124,26 124,50 C124,58 118,64 116,68 C114,56 86,56 84,68 C82,64 76,58 76,50 Z" fill="#2d2825" />
+              <!-- 목 & 주얼리 -->
+              <path id="morph-neck" d="M92,72 L92,94 L108,94 L108,72 Z" fill="url(#lightSkinGlow)" />
+              <path id="morph-necklace" d="M90,88 Q100,102 110,88" stroke="#ea2b42" stroke-width="2" fill="none" opacity="0.6" />
+              <!-- 상체/허리 -->
+              <path id="morph-torso" d="M64,102 Q100,98 136,102 L128,165 Q100,168 72,165 Z" fill="url(#lightSkinGlow)" />
+              <!-- 골반/하체 -->
+              <path id="morph-pelvis" d="M72,165 Q100,168 128,165 L136,210 Q100,215 64,210 Z" fill="url(#lightSkinGlow)" />
+              <!-- 다리 & 슈즈 -->
+              <path id="morph-legs" d="M72,210 L76,305 L88,305 L95,215 L105,215 L112,305 L124,305 L128,210 Z" fill="url(#lightSkinGlow)" />
+              <rect x="72" y="305" width="18" height="8" rx="3" fill="#1e293b" />
+              <rect x="110" y="305" width="18" height="8" rx="3" fill="#1e293b" />
+            </svg>
+          </div>
+
+          <div class="avatar-indicators">
+            <div class="indicator-item">
+              <span class="label">진단 톤:</span>
+              <strong id="live-tone-val">분석 대기중</strong>
+            </div>
+            <div class="indicator-item">
+              <span class="label">골격 특징:</span>
+              <strong id="live-shape-val">문진 진행중</strong>
+            </div>
+            <div class="indicator-item">
+              <span class="label">추천 주얼리:</span>
+              <strong id="live-jewel-val">실버 925 매칭</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 기본 신상 정보 (성별 / 연령대 / 실측 스펙) 사전 세팅 바 -->
+      <div class="profile-setting-bar" id="profile-pre-bar">
+        <div class="profile-bar-header">
+          <div class="profile-bar-title">
+            <i data-lucide="sliders-horizontal"></i>
+            <span>1단계: 기본 신상 정보 & 타겟 스타일 설정</span>
+          </div>
+          <span class="profile-applied-badge" id="profile-status-badge">
+            <i data-lucide="check-circle-2"></i> 맞춤 큐레이션 엔진 가동 중
+          </span>
+        </div>
+
+        <div class="profile-controls-grid">
+          <!-- 성별 선택 -->
+          <div class="profile-control-item">
+            <span class="profile-control-label"><i data-lucide="users"></i> 성별 (Gender)</span>
+            <div class="gender-toggle-duo">
+              <button type="button" class="gender-btn male" id="btn-gender-male" onclick="setUserGender('male')">
+                <i data-lucide="user"></i> 남성 (MEN)
+              </button>
+              <button type="button" class="gender-btn female active" id="btn-gender-female" onclick="setUserGender('female')">
+                <i data-lucide="user"></i> 여성 (WOMEN)
+              </button>
+            </div>
+          </div>
+
+          <!-- 연령대 선택 -->
+          <div class="profile-control-item">
+            <span class="profile-control-label"><i data-lucide="sparkles"></i> 연령대 (Age Group)</span>
+            <div class="age-chips-wrap">
+              <button type="button" class="age-chip-btn" data-age="20s" onclick="setUserAgeGroup('20s')">20대 (트렌디)</button>
+              <button type="button" class="age-chip-btn active" data-age="30s" onclick="setUserAgeGroup('30s')">30대 (미니멀/오피스)</button>
+              <button type="button" class="age-chip-btn" data-age="40s" onclick="setUserAgeGroup('40s')">40대+ (클래식/품격)</button>
+            </div>
+          </div>
+
+          <!-- 실측 신체 스펙 -->
+          <div class="profile-control-item">
+            <span class="profile-control-label"><i data-lucide="ruler"></i> 키 & 몸무게 (Size Korea 보정)</span>
+            <div class="spec-inputs-row">
+              <input type="number" id="input-user-height" class="spec-mini-input" value="164" onchange="updateUserSpecs()">
+              <span class="spec-unit">cm</span>
+              <input type="number" id="input-user-weight" class="spec-mini-input" value="49" onchange="updateUserSpecs()">
+              <span class="spec-unit">kg</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-target-notice">
+          <span id="profile-notice-text">💡 <strong>여성 30대</strong> 고객님을 위한 <strong>오피스·캐주얼 컨템포러리 브랜드(COS, 마시모두띠, 프론트로우)</strong> 중심으로 큐레이션됩니다.</span>
+        </div>
+      </div>
+
+      <!-- 사진 모드 안내 카드 (숨김 기본) -->
+      <div class="photo-mode-container" id="ai-photo-wrapper" style="display: none;">
+        <div class="photo-card-row">
+          <div class="photo-upload-box">
+            <i data-lucide="user-check"></i>
+            <h4>얼굴 정면 사진 분석</h4>
+            <p>자연광 아래서 턱 밑에 A4용지를 대고 찍으면 퍼스널컬러 정확도 99%</p>
+            <div class="card-btn-duo">
+              <button class="photo-act-pill red" onclick="openCameraViewfinder('face')">
+                <i data-lucide="camera"></i> 카메라로 촬영
+              </button>
+              <button class="photo-act-pill" onclick="simulatePhotoPick('face')">
+                <i data-lucide="image"></i> 갤러리 선택
+              </button>
+            </div>
+            <span class="photo-status" id="face-photo-status">대기 중</span>
+          </div>
+
+          <div class="photo-upload-box">
+            <i data-lucide="scan"></i>
+            <h4>전신 실루엣 사진 분석</h4>
+            <p>골격 비율(어깨, 허리, 골반)을 스캔하여 3대 체형 및 최적 사이즈 계산</p>
+            <div class="card-btn-duo">
+              <button class="photo-act-pill red" onclick="openCameraViewfinder('body')">
+                <i data-lucide="camera"></i> 카메라로 촬영
+              </button>
+              <button class="photo-act-pill" onclick="simulatePhotoPick('body')">
+                <i data-lucide="image"></i> 갤러리 선택
+              </button>
+            </div>
+            <span class="photo-status" id="body-photo-status">대기 중</span>
+          </div>
+        </div>
+        <button class="run-scan-btn" id="run-photo-scan-btn" disabled onclick="executePhotoScan()">AI 정밀 비전 스캔 실행</button>
+      </div>
+
+      <!-- 진단 결과 리포트 & 맞춤 큐레이션 쇼룸 -->
+      <div class="ai-result-section" id="ai-result-area" style="display: none;">
+        
+        <!-- 통합 프로필(성별/연령대) 및 진단 유형 스위처 바 -->
+        <div class="persona-switcher-bar">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; width:100%; margin-bottom:8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="switcher-label"><i data-lucide="users"></i> <strong>성별:</strong></span>
+              <div class="gender-toggle-duo" style="padding:2px;">
+                <button type="button" class="gender-btn male modal-sync-male" onclick="setUserGender('male')" style="padding:4px 12px; font-size:12px;">
+                  남성 (MEN)
+                </button>
+                <button type="button" class="gender-btn female active modal-sync-female" onclick="setUserGender('female')" style="padding:4px 12px; font-size:12px;">
+                  여성 (WOMEN)
+                </button>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="switcher-label"><i data-lucide="sparkles"></i> <strong>연령대:</strong></span>
+              <div class="age-chips-wrap">
+                <button type="button" class="age-chip-btn modal-sync-age-20s" onclick="setUserAgeGroup('20s')" style="padding:3px 9px; font-size:11.5px;">20대</button>
+                <button type="button" class="age-chip-btn active modal-sync-age-30s" onclick="setUserAgeGroup('30s')" style="padding:3px 9px; font-size:11.5px;">30대</button>
+                <button type="button" class="age-chip-btn modal-sync-age-40s" onclick="setUserAgeGroup('40s')" style="padding:3px 9px; font-size:11.5px;">40대+</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:10px; width:100%; flex-wrap:wrap; border-top:1px dashed var(--border-light); padding-top:8px;">
+            <span class="switcher-label"><i data-lucide="shuffle"></i> <strong>톤·골격 유형:</strong></span>
+            <div class="persona-chips">
+              <button type="button" class="persona-chip active" data-persona="summer_cool_wave" onclick="changeDiagnosisPersona('summer_cool_wave')">
+                ❄️ 여름 쿨톤 · 웨이브
+              </button>
+              <button type="button" class="persona-chip" data-persona="spring_warm_straight" onclick="changeDiagnosisPersona('spring_warm_straight')">
+                🌸 봄 웜톤 · 스트레이트
+              </button>
+              <button type="button" class="persona-chip" data-persona="autumn_warm_natural" onclick="changeDiagnosisPersona('autumn_warm_natural')">
+                🍂 가을 웜톤 · 내추럴
+              </button>
+              <button type="button" class="persona-chip" data-persona="winter_cool_straight" onclick="changeDiagnosisPersona('winter_cool_straight')">
+                💎 겨울 쿨톤 · 스트레이트
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-header">
+          <span class="result-badge" id="page-result-badge">AI PERSONAL REPORT</span>
+          <h3 id="page-result-title">고객님을 위한 <span class="highlight-blue">여름 쿨 뮤트 & 웨이브 체형</span> 솔루션</h3>
+          <p id="page-result-desc">노란기를 뺀 부드러운 라벤더·스카이블루와 하이웨이스트 A라인 실루엣이 결점을 가리고 장점을 극대화합니다.</p>
+          
+          <!-- 실시간 비전 측정 데이터 칩 -->
+          <div class="vision-metrics-pill" id="page-vision-metrics">
+            <span class="swatch-sample-box" id="page-swatch-box" style="background:#e8d1c5;"></span>
+            <span>추출 피부색: <strong id="page-metrics-rgb">RGB(232, 209, 197)</strong></span>
+            <span>• 색공간: <strong id="page-metrics-lab">Lab(85, 8, 8)</strong></span>
+            <span>• 언더톤 분류: <strong id="page-metrics-tone" style="color:var(--primary);">Cool Mute (쿨톤)</strong></span>
+          </div>
+        </div>
+
+        <!-- 3대 분석 카드 -->
+        <div class="report-cards-grid">
+          <div class="rep-card">
+            <div class="rep-icon"><i data-lucide="palette"></i></div>
+            <h4 id="page-card1-title">퍼스널 컬러: 여름 쿨 뮤트</h4>
+            <p id="page-card1-desc">청량하고 차분한 파스텔 블루, 안개 낀 라벤더, 뮤트 로즈가 얼굴빛을 환하게 틔워줍니다.</p>
+            <div class="palette-dots" id="page-palette-dots">
+              <span style="background: #8b9dc3;" title="더스티 스카이"></span>
+              <span style="background: #b39eb5;" title="라벤더 포그"></span>
+              <span style="background: #d4c4c8;" title="뮤트 로즈"></span>
+              <span style="background: #f8fafc;" title="클라우드 화이트"></span>
+            </div>
+          </div>
+          <div class="rep-card">
+            <div class="rep-icon"><i data-lucide="maximize-2"></i></div>
+            <h4 id="page-card2-title">체형 골격: 웨이브 실루엣</h4>
+            <p id="page-card2-desc">가늘고 우아한 상체선과 부드러운 골반 라인. 허리선을 올려 잡는 크롭 상의 + 와이드 슬랙스가 필승 조합입니다.</p>
+            <div class="tag-pills" id="page-card2-tags">
+              <span>#하이웨이스트</span> <span>#숏자켓</span> <span>#허리선강조</span>
+            </div>
+          </div>
+          <div class="rep-card">
+            <div class="rep-icon"><i data-lucide="gem"></i></div>
+            <h4 id="page-card3-title">주얼리 & 넥라인: 플래티넘 실버</h4>
+            <p id="page-card3-desc">목선을 길어 보이게 하는 U넥/보트넥 상의에, 투명감을 극대화하는 실버925 드롭 이어링을 매칭하세요.</p>
+            <div class="tag-pills" id="page-card3-tags">
+              <span>#실버925</span> <span>#드롭귀걸이</span> <span>#보트넥</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 머리부터 발끝까지 Full-Outfit 큐레이션 쇼룸 -->
+        <div class="curated-showroom-wrap">
+          <div class="showroom-bar">
+            <div>
+              <h4 id="page-showroom-title">머리부터 발끝까지: AI 맞춤 풀착장 세트</h4>
+              <p id="page-showroom-desc">무신사, 29CM, W컨셉, ZARA, COS 등 국내외 주요 쇼핑몰에서 고객님 체형·톤 적합도 95% 이상인 상품만 실시간 필터링했습니다.</p>
+            </div>
+            <button class="bundle-cart-btn" onclick="addAllCuratedToCart()">
+              <i data-lucide="shopping-bag"></i>
+              <span>풀착장 5종 전체 담기 (할인·품절 알림 가동)</span>
+            </button>
+          </div>
+
+          <div class="curated-items-grid" id="curated-items-grid">
+            <!-- JS 동적 렌더링 -->
+          </div>
+        </div>
+
+        <!-- =========================================================================
+             쇼핑몰 데이터 소스 및 실시간 AI 크롤링 기술 안내 섹션
+             ========================================================================= -->
+        <div class="mall-intelligence-section">
+          <div class="mall-intel-header">
+            <span class="mall-intel-badge">AI COMMERCE CRAWLER & VISION INDEXING</span>
+            <h3>🔍 분석을 위한 기초자료는 어디서 갖고 온 건가요?</h3>
+            <p>국내외 6대 패션 플랫폼(무신사, 29CM, W컨셉, ZARA, COS, 에이블리/지그재그)의 <strong>실시간 상품 스펙 DB</strong>와 <strong>컴퓨터 비전 멀티모달 AI</strong>를 연동하여 분석합니다.</p>
+          </div>
+
+          <div class="mall-tech-grid">
+            <div class="mall-tech-card">
+              <div class="mall-tech-icon"><i data-lucide="database"></i></div>
+              <h5>1. 6대 쇼핑몰 실시간 카탈로그 연동</h5>
+              <p>무신사, 29CM, W컨셉, ZARA 등 주요 패션몰의 상품 API와 웹 스크래퍼를 통해 <strong>소재 혼용률, 실측 치수표(어깨/가슴/총장), 실시간 재고·가격</strong>을 수집합니다.</p>
+              <div class="mall-tags-list">
+                <span>무신사</span> <span>29CM</span> <span>W컨셉</span> <span>ZARA</span> <span>COS</span> <span>지그재그</span>
+              </div>
+            </div>
+
+            <div class="mall-tech-card">
+              <div class="mall-tech-icon"><i data-lucide="scan-face"></i></div>
+              <h5>2. 비전 멀티모달 AI 속성 분해</h5>
+              <p>상품 썸네일과 모델 착용샷에서 <strong>넥라인(보트넥/브이넥/스퀘어넥), 명도/채도(Lab 색공간), 실루엣(크롭/A라인/H라인)</strong>을 딥러닝 비전 엔진으로 자동 태깅합니다.</p>
+              <div class="mall-tags-list">
+                <span>Vision Transformer</span> <span>CLIP 임베딩</span> <span>Lab 색소 분해</span>
+              </div>
+            </div>
+
+            <div class="mall-tech-card">
+              <div class="mall-tech-icon"><i data-lucide="cpu"></i></div>
+              <h5>3. 개인 체형·톤 벡터 매칭</h5>
+              <p>고객님의 카메라 사진 분석 결과(여름쿨/웨이브 등)와 50만+ 쇼핑몰 상품 벡터 간의 <strong>코사인 유사도 매칭(Cosine Similarity)</strong>을 거쳐 90% 이상 일치하는 옷만 큐레이션합니다.</p>
+              <div class="mall-tags-list">
+                <span>95% 매칭 알고리즘</span> <span>체형 결점 보완</span> <span>품절·할인 트래커</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 실제 쇼핑몰 URL 직접 넣어보기 체험 도구 -->
+          <div class="url-analyzer-box">
+            <div class="url-analyzer-title">
+              <i data-lucide="link"></i>
+              <h4>각종 패션 쇼핑몰 제품도 직접 분석할 수 있나요? (URL 분석 시뮬레이터)</h4>
+            </div>
+            <p>보고 계신 무신사, 29CM, ZARA 상품의 링크를 붙여넣으시면, AI가 해당 제품의 넥라인, 톤 적합도, 체형 추천 여부를 즉시 계산합니다.</p>
+            
+            <div class="url-input-group">
+              <input type="text" id="custom-mall-url" placeholder="예: https://www.musinsa.com/app/goods/3482910 또는 29CM 상품 링크..." value="https://www.29cm.co.kr/product/1849204 (COS 파인 게이지 보트넥 니트)">
+              <button type="button" class="btn-url-analyze" onclick="analyzeCustomMallUrl()">
+                <i data-lucide="sparkles"></i> AI 상품 정밀 분석
+              </button>
+            </div>
+
+            <div class="sample-url-chips">
+              <span class="sample-label">샘플 테스트:</span>
+              <button type="button" class="sample-chip" onclick="setSampleUrl('musinsa')">무신사 테일러드 싱글 자켓</button>
+              <button type="button" class="sample-chip" onclick="setSampleUrl('29cm')">29CM 던스트 코랄 캐시미어</button>
+              <button type="button" class="sample-chip" onclick="setSampleUrl('zara')">ZARA 하이라이즈 와이드 팬츠</button>
+            </div>
+
+            <!-- URL 분석 결과 미리보기 카드 (동적 렌더링) -->
+            <div class="url-analysis-result-card" id="url-analysis-result" style="display: none;">
+              <!-- JS 동적 렌더링 -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================================================
+         VIEW 3: 스타일 커뮤니티 (패션 Q&A / 고민상담 / 투표)
+         ========================================================================= -->
+    <section id="view-community" class="content-view" style="display: none;">
+      
+      <div class="community-header">
+        <div>
+          <h2>패션 고민 나누기 & 커뮤니티</h2>
+          <p>오늘의집 '노하우·질문과답변'처럼 패션 꿀팁, 체형별 브랜드 추천, 코디 투표를 자유롭게 나눠보세요.</p>
+        </div>
+        <button class="write-post-btn" onclick="openCommunityPostModal()">
+          <i data-lucide="edit-3"></i> <span>글쓰기</span>
+        </button>
+      </div>
+
+      <!-- 커뮤니티 카테고리 탭 -->
+      <div class="comm-category-tabs">
+        <button class="comm-tab active" onclick="filterCommunity('all', this)">전체</button>
+        <button class="comm-tab" onclick="filterCommunity('골라줘', this)">🗳️ 골라줘! (코디 투표)</button>
+        <button class="comm-tab" onclick="filterCommunity('사이즈질문', this)">📏 사이즈·핏 질문</button>
+        <button class="comm-tab" onclick="filterCommunity('체형고민', this)">👗 체형 커버 고민</button>
+        <button class="comm-tab" onclick="filterCommunity('세일정보', this)">🏷️ 세일 & 꿀템 정보</button>
+      </div>
+
+      <!-- 커뮤니티 게시글 목록 -->
+      <div class="community-posts-list" id="community-posts-list">
+        <!-- JS 동적 렌더링 -->
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- =========================================================================
+       MODAL 1: 내 패션 자랑하기 (새 OOTD 등록 - 사진 + 옷 정보 태그)
+       ========================================================================= -->
+  <div class="modal-overlay" id="upload-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>✨ 내 코디 자랑하기 (OOTD 등록)</h3>
+        <button class="close-modal-btn" onclick="closeModal('upload-modal')">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>코디 사진 등록 (카메라 촬영 or 사진 선택)</label>
+          
+          <!-- 직접 카메라 촬영 및 파일 선택 버튼 그룹 -->
+          <div class="photo-capture-actions">
+            <button type="button" class="camera-action-btn primary" onclick="openCameraViewfinder('ootd')">
+              <i data-lucide="camera"></i>
+              <span>📸 카메라로 지금 바로 찍기 (노트북/스마트폰)</span>
+            </button>
+            <label class="camera-action-btn secondary" for="file-upload-input">
+              <i data-lucide="image"></i>
+              <span>📁 앨범/파일에서 사진 선택</span>
+              <input type="file" id="file-upload-input" accept="image/*" capture="environment" style="display: none;" onchange="handleNativePhotoUpload(this, 'ootd')">
+            </label>
+          </div>
+
+          <!-- 사진 미리보기 및 샘플 선택 -->
+          <div class="current-photo-preview" id="ootd-photo-preview-box" style="display: block;">
+            <img id="post-preview-img" src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80" alt="코디 미리보기">
+            <span class="preview-badge">선택된 사진</span>
+          </div>
+
+          <label style="margin-top: 12px; font-size: 11.5px; color: var(--text-sub);">또는 추천 샘플 모델 선택</label>
+          <div class="preset-photo-selector">
+            <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=500&q=80" class="sample-thumb selected" onclick="pickSamplePhoto(this)" alt="샘플 1">
+            <img src="https://images.unsplash.com/photo-1550614000-4895a10e1bfd?auto=format&fit=crop&w=500&q=80" class="sample-thumb" onclick="pickSamplePhoto(this)" alt="샘플 2">
+            <img src="https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=500&q=80" class="sample-thumb" onclick="pickSamplePhoto(this)" alt="샘플 3">
+          </div>
+          <input type="hidden" id="post-img-url" value="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>내 키 / 몸무게</label>
+            <input type="text" id="post-body-spec" value="164cm · 49kg" placeholder="예: 165cm · 51kg" />
+          </div>
+          <div class="form-group">
+            <label>퍼스널컬러 / 체형</label>
+            <input type="text" id="post-tone-spec" value="여름 쿨톤 · 웨이브 체형" placeholder="예: 봄 웜톤 · 스트레이트" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>착장 정보 태그 (오늘의집 가구 태그처럼 공유돼요!)</label>
+          <input type="text" id="post-tag-item" value="상의: 자라 크롭 가디건 (M) / 하의: 코스 와이드 슬랙스" placeholder="예: 상의: 자라 / 하의: 스파오 / 신발: 뉴발란스" />
+        </div>
+
+        <div class="form-group">
+          <label>스타일링 코멘트 & 꿀팁</label>
+          <textarea id="post-content" rows="3" placeholder="오늘 룩의 포인트나 체형 보완 꿀팁을 적어주세요!"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('upload-modal')">취소</button>
+        <button class="btn-primary" onclick="submitNewOotd()">OOTD 등록하고 자랑하기</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================================
+       MODAL 2: OOTD 상세 보기 모달 (착장 태그 핀 + 댓글)
+       ========================================================================= -->
+  <div class="modal-overlay" id="ootd-detail-modal">
+    <div class="modal-card wide-card">
+      <button class="close-modal-btn float-close" onclick="closeModal('ootd-detail-modal')">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="detail-split-layout">
+        <!-- 좌측: 사진 및 상품 태그 핀 -->
+        <div class="detail-img-box">
+          <img id="detail-img" src="" alt="코디 사진">
+          <!-- 오늘의집 스타일 착장 태그 핀 -->
+          <div class="item-tag-pin pin-1" id="tag-pin-1" title="착장 아이템 확인">
+            <span class="pin-dot"></span>
+            <div class="pin-popover" id="pin-popover-1">
+              <span class="pin-brand">ZARA</span>
+              <strong class="pin-title">파인니트 크롭 가디건</strong>
+              <span class="pin-price">₩ 49,900</span>
+            </div>
+          </div>
+          <div class="item-tag-pin pin-2" id="tag-pin-2" title="착장 아이템 확인">
+            <span class="pin-dot"></span>
+            <div class="pin-popover" id="pin-popover-2">
+              <span class="pin-brand">COS</span>
+              <strong class="pin-title">테일러드 와이드 트라우저</strong>
+              <span class="pin-price">₩ 150,000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 우측: 작성자 프로필, 내용, 댓글 -->
+        <div class="detail-content-box">
+          <div class="detail-user-row">
+            <img id="detail-author-avatar" src="" alt="작성자">
+            <div>
+              <h4 id="detail-author-name">작성자</h4>
+              <span id="detail-author-specs" class="user-specs-text">스펙</span>
+            </div>
+            <button class="follow-btn" id="follow-toggle-btn" onclick="toggleFollow(this)">팔로우</button>
+          </div>
+
+          <div class="detail-text-body">
+            <p id="detail-desc"></p>
+            <div class="detail-items-panel">
+              <h5>🏷️ 착용한 아이템 정보</h5>
+              <div id="detail-items-list" class="items-list-rows"></div>
+            </div>
+          </div>
+
+          <div class="detail-social-bar">
+            <button class="social-btn" onclick="likeCurrentPost()">
+              <i data-lucide="heart" id="detail-like-icon"></i>
+              <span id="detail-likes-count">0</span>
+            </button>
+            <button class="social-btn" onclick="scrapCurrentPost()">
+              <i data-lucide="bookmark" id="detail-scrap-icon"></i>
+              <span id="detail-scraps-count">0</span>
+            </button>
+            <button class="social-btn" onclick="sharePost()">
+              <i data-lucide="share-2"></i>
+              <span>공유</span>
+            </button>
+          </div>
+
+          <!-- 댓글 영역 -->
+          <div class="comments-area">
+            <h5>댓글 <span id="detail-comment-count">2</span></h5>
+            <div class="comments-scroll-list" id="detail-comments-list">
+              <!-- 댓글 동적 렌더링 -->
+            </div>
+            <div class="comment-input-bar">
+              <input type="text" id="new-comment-input" placeholder="칭찬과 궁금한 점을 남겨보세요..." />
+              <button onclick="submitComment()">등록</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================================
+       MODAL 3: 로그인 & 회원가입 모달
+       ========================================================================= -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal-card auth-card">
+      <div class="modal-header">
+        <h3>OOTD 오늘의 코디 시작하기</h3>
+        <button class="close-modal-btn" onclick="closeModal('auth-modal')">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">로그인</button>
+          <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">회원가입</button>
+        </div>
+
+        <div id="login-form">
+          <div class="form-group">
+            <label>이메일 주소</label>
+            <input type="email" id="login-email" value="fashionlover@ootdhouse.com" placeholder="example@email.com">
+          </div>
+          <div class="form-group">
+            <label>비밀번호</label>
+            <input type="password" id="login-pw" value="••••••••" placeholder="비밀번호 입력">
+          </div>
+          <button class="btn-primary full-btn" onclick="doLogin()">로그인</button>
+        </div>
+
+        <div id="register-form" style="display: none;">
+          <div class="form-group">
+            <label>닉네임</label>
+            <input type="text" id="reg-nickname" placeholder="멋진 패셔니스타">
+          </div>
+          <div class="form-group">
+            <label>이메일 주소</label>
+            <input type="email" id="reg-email" placeholder="example@email.com">
+          </div>
+          <div class="form-group">
+            <label>비밀번호</label>
+            <input type="password" id="reg-pw" placeholder="8자 이상 입력">
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>키/몸무게 (선택)</label>
+              <input type="text" id="reg-specs" placeholder="165cm · 50kg">
+            </div>
+            <div class="form-group">
+              <label>퍼스널컬러 (선택)</label>
+              <select id="reg-tone">
+                <option value="여름쿨톤">여름 쿨톤</option>
+                <option value="봄웜톤">봄 웜톤</option>
+                <option value="가을웜톤">가을 웜톤</option>
+                <option value="겨울쿨톤">겨울 쿨톤</option>
+                <option value="잘모름">AI 진단 예정</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-primary full-btn" onclick="doRegister()">1초 만에 회원가입 완료</button>
+        </div>
+
+        <div class="social-login-divider">
+          <span>간편 로그인</span>
+        </div>
+        <button class="kakao-login-btn" onclick="doSocialLogin('카카오')">
+          <span>카카오로 3초 만에 시작하기</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================================
+       MODAL 4: 커뮤니티 글쓰기 모달
+       ========================================================================= -->
+  <div class="modal-overlay" id="comm-post-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>💬 패션 고민·질문 글쓰기</h3>
+        <button class="close-modal-btn" onclick="closeModal('comm-post-modal')">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>카테고리 선택</label>
+          <select id="comm-category-select">
+            <option value="골라줘">🗳️ 골라줘! (코디 투표)</option>
+            <option value="사이즈질문">📏 사이즈·핏 질문</option>
+            <option value="체형고민">👗 체형 커버 고민</option>
+            <option value="세일정보">🏷️ 세일 & 꿀템 정보</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>제목</label>
+          <input type="text" id="comm-title-input" placeholder="고민이나 질문의 핵심을 요약해주세요">
+        </div>
+        <div class="form-group">
+          <label>내용</label>
+          <textarea id="comm-body-input" rows="4" placeholder="자세한 체형 스펙이나 상황(예: 결혼식 하객룩, 데이트룩)을 적어주시면 회원분들이 친절하게 답변해드려요!"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('comm-post-modal')">취소</button>
+        <button class="btn-primary" onclick="submitCommunityPost()">게시글 등록</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 5: 실시간 카메라 촬영 뷰파인더 (노트북 웹캠 & 스마트폰 카메라)
+       ========================================================================= -->
+  <div class="modal-overlay" id="camera-modal">
+    <div class="modal-card camera-card">
+      <div class="modal-header">
+        <div class="camera-title-group">
+          <i data-lucide="camera"></i>
+          <h3 id="camera-modal-title">실시간 카메라 촬영</h3>
+        </div>
+        <button class="close-modal-btn" onclick="closeCameraViewfinder()">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body camera-modal-body">
+        <div class="camera-viewport-box">
+          <video id="webcam-stream" autoplay playsinline muted></video>
+          <div class="camera-grid-guide" id="camera-guide-overlay">
+            <div class="guide-circle" id="camera-guide-shape"></div>
+            <span class="guide-tip" id="camera-guide-text">화면에 맞춰 포즈를 취해주세요</span>
+          </div>
+          <canvas id="camera-snapshot-canvas" style="display: none;"></canvas>
+        </div>
+
+        <div class="camera-controls-bar">
+          <button type="button" class="cam-aux-btn" onclick="toggleCameraFacing()" title="전면/후면 카메라 전환">
+            <i data-lucide="refresh-cw"></i>
+            <span>카메라 전환</span>
+          </button>
+
+          <button type="button" class="cam-shutter-btn" onclick="captureCurrentFrame()" title="사진 촬영">
+            <div class="shutter-inner-circle"></div>
+          </button>
+
+          <button type="button" class="cam-aux-btn" onclick="closeCameraViewfinder()">
+            <span>취소</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 6: AI 정밀 분석 결과 리포트 & 풀착장 쇼룸 전용 팝업 모달
+       ========================================================================= -->
+  <div class="modal-overlay" id="diagnosis-result-modal">
+    <div class="modal-card wide-card result-popup-card">
+      <div class="modal-header">
+        <div class="result-modal-badge-row">
+          <span class="badge-ai" style="background:var(--primary); color:#fff; padding:4px 8px; border-radius:4px; font-weight:800; font-size:11px; margin-right:8px;">AI 비전 분석 완료</span>
+          <h3 style="display:inline-block; font-size:18px; font-weight:800;">🎉 고객님을 위한 VIP 맞춤 스타일링 진단서</h3>
+        </div>
+        <button class="close-modal-btn" onclick="closeModal('diagnosis-result-modal')">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body result-modal-scroll" style="max-height: 75vh; overflow-y: auto; padding: 20px;">
+        
+        <!-- 모달 내부 즉시 체형/톤 전환 테스트 스위처 -->
+        <div class="persona-switcher-bar modal-switcher" style="margin-bottom: 16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; width:100%; margin-bottom:8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="switcher-label"><i data-lucide="users"></i> <strong>성별:</strong></span>
+              <div class="gender-toggle-duo" style="padding:2px;">
+                <button type="button" class="gender-btn male modal-sync-male" onclick="setUserGender('male')" style="padding:4px 12px; font-size:12px;">
+                  남성 (MEN)
+                </button>
+                <button type="button" class="gender-btn female active modal-sync-female" onclick="setUserGender('female')" style="padding:4px 12px; font-size:12px;">
+                  여성 (WOMEN)
+                </button>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="switcher-label"><i data-lucide="sparkles"></i> <strong>연령대:</strong></span>
+              <div class="age-chips-wrap">
+                <button type="button" class="age-chip-btn modal-sync-age-20s" onclick="setUserAgeGroup('20s')" style="padding:3px 9px; font-size:11.5px;">20대</button>
+                <button type="button" class="age-chip-btn active modal-sync-age-30s" onclick="setUserAgeGroup('30s')" style="padding:3px 9px; font-size:11.5px;">30대</button>
+                <button type="button" class="age-chip-btn modal-sync-age-40s" onclick="setUserAgeGroup('40s')" style="padding:3px 9px; font-size:11.5px;">40대+</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:10px; width:100%; flex-wrap:wrap; border-top:1px dashed var(--border-light); padding-top:8px;">
+            <span class="switcher-label"><i data-lucide="shuffle"></i> <strong>톤·골격:</strong></span>
+            <div class="persona-chips">
+              <button type="button" class="persona-chip modal-chip active" data-persona="summer_cool_wave" onclick="changeDiagnosisPersona('summer_cool_wave')">
+                ❄️ 여름 쿨톤 · 웨이브
+              </button>
+              <button type="button" class="persona-chip modal-chip" data-persona="spring_warm_straight" onclick="changeDiagnosisPersona('spring_warm_straight')">
+                🌸 봄 웜톤 · 스트레이트
+              </button>
+              <button type="button" class="persona-chip modal-chip" data-persona="autumn_warm_natural" onclick="changeDiagnosisPersona('autumn_warm_natural')">
+                🍂 가을 웜톤 · 내추럴
+              </button>
+              <button type="button" class="persona-chip modal-chip" data-persona="winter_cool_straight" onclick="changeDiagnosisPersona('winter_cool_straight')">
+                💎 겨울 쿨톤 · 스트레이트
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 상단 요약 배너 -->
+        <div class="result-summary-banner" id="modal-summary-banner" style="display:flex; gap:18px; align-items:center; background:var(--primary-light); padding:18px; border-radius:12px; margin-bottom:20px; border:1px solid rgba(234,43,66,0.2);">
+          <div class="summary-thumb-box" style="width:85px; height:85px; border-radius:10px; overflow:hidden; flex-shrink:0; border:2px solid var(--primary); position:relative;">
+            <img id="result-user-photo" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="분석 사진" style="width:100%; height:100%; object-fit:cover;">
+            <span class="thumb-badge" id="modal-thumb-badge" style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.6); color:#fff; font-size:9.5px; text-align:center; padding:1px 0;">사진 분석</span>
+          </div>
+          <div class="summary-info">
+            <h4 style="font-size:16px; margin-bottom:4px;" id="modal-result-title">진단 결과: <strong style="color:var(--primary);">여름 쿨 뮤트</strong> & <strong style="color:var(--primary);">웨이브 골격</strong></h4>
+            <p style="font-size:12.5px; color:var(--text-main); line-height:1.45; margin-bottom:8px;" id="modal-result-desc">피부 Lab 언더톤과 골격 비율을 정밀 분석한 결과, 맑고 투명한 인상을 주는 <strong>더스티 파스텔 쿨톤</strong>과 <strong>하이웨이스트 실루엣</strong>이 최적의 조합입니다.</p>
+            
+            <div class="vision-metrics-pill" style="margin-bottom:8px; font-size:11.5px;">
+              <span class="swatch-sample-box" id="modal-swatch-box" style="background:#e8d1c5; width:14px; height:14px; border-radius:3px; display:inline-block; vertical-align:middle; border:1px solid rgba(0,0,0,0.15);"></span>
+              <span>피부 측정값: <strong id="modal-metrics-rgb">RGB(232, 209, 197)</strong></span>
+              <span>• <strong id="modal-metrics-lab">Lab(85, 8, 8)</strong></span>
+            </div>
+
+            <div class="tag-pills" id="modal-tag-pills">
+              <span>#퍼스널컬러_여름쿨</span>
+              <span>#체형_웨이브</span>
+              <span>#보트넥_찰떡</span>
+              <span>#실버925_주얼리</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3대 핵심 처방 카드 -->
+        <div class="report-cards-grid" style="margin-bottom: 24px;">
+          <div class="rep-card">
+            <div class="rep-icon"><i data-lucide="palette"></i></div>
+            <h4 id="modal-card1-title">🎨 베스트 컬러 팔레트</h4>
+            <p id="modal-card1-desc">얼굴빛을 화사하게 틔워주는 쿨톤 파스텔</p>
+            <div class="palette-dots" id="modal-palette-dots">
+              <span style="background: #8b9dc3;" title="더스티 스카이"></span>
+              <span style="background: #b39eb5;" title="라벤더 포그"></span>
+              <span style="background: #d4c4c8;" title="뮤트 로즈"></span>
+              <span style="background: #f8fafc;" title="클라우드 화이트"></span>
+            </div>
+          </div>
+          <div class="rep-card">
+            <div class="rep-icon"><i data-lucide="maximize-2"></i></div>
+            <h4 id="modal-card2-title">👗 체형 보완 핏 공식</h4>
+            <p id="modal-card2-desc">상체를 콤팩트하게, 허리선을 높여 다리를 길게</p>
+            <div class="tag-pills" id="modal-card2-tags">
+              <span>#크롭상의</span> <span>#A라인슬랙스</span> <span>#스트랩코트</span>
+            </div>
+          </div>
+          <div class="rep-card">
+            <div class="rep-icon"><i data-lucide="gem"></i></div>
+            <h4 id="modal-card3-title">💎 넥라인 & 주얼리</h4>
+            <p id="modal-card3-desc">쇄골을 시원하게 드러내고 플래티넘 실버 매칭</p>
+            <div class="tag-pills" id="modal-card3-tags">
+              <span>#보트넥/스퀘어넥</span> <span>#실버925</span> <span>#드롭이어링</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 풀착장 추천 쇼룸 섹션 -->
+        <div class="curated-showroom-wrap" style="padding: 20px;">
+          <div class="showroom-bar" style="margin-bottom:16px;">
+            <div>
+              <h4 style="font-size:16px; font-weight:800;">머리부터 발끝까지: AI 맞춤 풀착장 세트</h4>
+              <p style="font-size:12px; color:var(--text-sub);">내 체형 실측을 반영한 최적 사이즈(브랜드 보정)와 실시간 가격 할인 추적 상품들입니다.</p>
+            </div>
+            <button class="bundle-cart-btn" onclick="addAllCuratedToCart()">
+              <i data-lucide="shopping-bag"></i>
+              <span>풀착장 5종 전체 담기 (할인·품절 알림 가동)</span>
+            </button>
+          </div>
+
+          <div class="curated-items-grid" id="modal-curated-items-grid">
+            <!-- JS 렌더링 -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary full-btn" onclick="closeModal('diagnosis-result-modal')">확인 완료 (계속 둘러보기)</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================================
+       SLIDE DRAWER: 스마트 장바구니 & 가격/품절 알림
+       ========================================================================= -->
+  <div class="cart-drawer-overlay" id="cart-drawer">
+    <div class="drawer-backdrop" onclick="closeCartDrawer()"></div>
+    <div class="drawer-panel">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <i data-lucide="bell-ring"></i>
+          <h4>스마트 장바구니 & 알림</h4>
+        </div>
+        <button class="drawer-close-btn" onclick="closeCartDrawer()">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div class="drawer-alert-banner">
+        <i data-lucide="zap"></i>
+        <span>장바구니에 보관된 상품은 <strong>가격 할인(Price Drop)</strong> 및 <strong>품절 임박</strong> 시 즉시 알림이 발송됩니다.</span>
+      </div>
+
+      <!-- 시뮬레이터 테스트 버튼 -->
+      <div class="sim-test-bar">
+        <button class="sim-btn sale" onclick="simulatePriceDrop()">⚡ 30% 세일 감지 테스트</button>
+        <button class="sim-btn stock" onclick="simulateLowStock()">🚨 잔여 1개 품절임박 테스트</button>
+      </div>
+
+      <!-- 장바구니 리스트 -->
+      <div class="drawer-items-list" id="cart-drawer-items">
+        <!-- JS 렌더링 -->
+      </div>
+
+      <div class="drawer-footer">
+        <div class="drawer-total-row">
+          <span>합계 금액</span>
+          <strong id="cart-drawer-total">₩ 0</strong>
+        </div>
+        <button class="btn-checkout" onclick="alert('제휴 파트너 스토어 결제 페이지로 연결됩니다.');">
+          주문하러 가기
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================================
+       모바일 하단 네비게이션 바 (스마트폰 앱 경험 제공)
+       ========================================================================= -->
+  <nav class="mobile-bottom-nav">
+    <button class="m-nav-item active" data-target="feed" onclick="switchNav('feed')">
+      <i data-lucide="grid"></i>
+      <span>OOTD자랑</span>
+    </button>
+    <button class="m-nav-item" data-target="ai-counseling" onclick="switchNav('ai-counseling')">
+      <i data-lucide="sparkles"></i>
+      <span>AI진단</span>
+    </button>
+    <button class="m-nav-item plus-center" onclick="openModal('upload-modal')">
+      <div class="circle-plus">
+        <i data-lucide="plus"></i>
+      </div>
+      <span>자랑하기</span>
+    </button>
+    <button class="m-nav-item" data-target="community" onclick="switchNav('community')">
+      <i data-lucide="message-circle"></i>
+      <span>커뮤니티</span>
+    </button>
+    <button class="m-nav-item" onclick="openCartDrawer()">
+      <i data-lucide="bell"></i>
+      <span>알림·카트</span>
+      <span class="m-badge" id="m-cart-badge">0</span>
+    </button>
+  </nav>
+
+  <script src="app.js?v=20260910_05"></script>
+</body>
+</html>
