@@ -4191,3 +4191,82 @@ body.force-mobile-mode .partner-pilot-box {
   align-items: center;
   text-align: center;
 }
+
+/* 글씨 정렬: 한글은 단어 단위로 줄바꿈, 헤더 글씨는 한 줄 유지 */
+body.light-theme {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.view-mode-btn span,
+.nav-item span,
+.user-logged-name {
+  white-space: nowrap;
+}
+
+.user-logged-name {
+  max-width: 96px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-bar-wrap {
+  flex-shrink: 1;
+  min-width: 150px;
+}
+
+/* PC 헤더: 폭이 좁아질수록 덜 중요한 요소부터 줄여 한 줄 유지 */
+@media (min-width: 769px) and (max-width: 1500px) {
+  .view-mode-btn span,
+  body.force-pc-mode .view-mode-btn span {
+    display: none !important;
+  }
+  .view-mode-btn,
+  body.force-pc-mode .view-mode-btn {
+    padding: 6px 9px;
+  }
+}
+@media (min-width: 769px) and (max-width: 1280px) {
+  .header-actions .search-bar-wrap,
+  body.force-pc-mode .header-actions .search-bar-wrap {
+    display: none !important;
+  }
+}
+@media (min-width: 769px) and (max-width: 1100px) {
+  .header-actions .user-logged-name,
+  body.force-pc-mode .header-actions .user-logged-name {
+    display: none !important;
+  }
+}
+@media (min-width: 769px) and (max-width: 960px) {
+  .header-actions .view-mode-toggle-group,
+  body.force-pc-mode .header-actions .view-mode-toggle-group {
+    display: none !important;
+  }
+  .header-actions .write-post-btn span,
+  body.force-pc-mode .header-actions .write-post-btn span {
+    display: none !important;
+  }
+  .nav-item,
+  body.force-pc-mode .nav-item {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+}
+@media (min-width: 769px) {
+  .header-actions,
+  body.force-pc-mode .header-actions {
+    gap: 10px;
+  }
+}
+@media (min-width: 769px) and (max-width: 880px) {
+  .nav-item .badge-ai,
+  body.force-pc-mode .nav-item .badge-ai {
+    display: none;
+  }
+  .nav-item,
+  body.force-pc-mode .nav-item {
+    padding: 8px 8px;
+    font-size: 13px;
+  }
+}
