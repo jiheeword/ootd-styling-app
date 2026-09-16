@@ -147,4 +147,6 @@ localStorage.removeItem('ootd_style_diagnosis_v1');
 
 ## 9. 배포 링크
 
-- **Vercel**: [https://temporary-sonic-dune-ubv08dc.vercel.app](https://temporary-sonic-dune-ubv08dc.vercel.app) (이 저장소의 최신 커밋이 반영되지 않았을 수 있습니다)
+- **MVP 데모 (GitHub Pages, PC·모바일)**: [https://jiheeword.github.io/ootd-styling-app/](https://jiheeword.github.io/ootd-styling-app/)
+  - 휴대폰에서 열고 브라우저 메뉴의 **홈 화면에 추가**를 누르면 앱 아이콘으로 설치할 수 있습니다.
+- **Vercel (기존)**: [https://temporary-sonic-dune-ubv08dc.vercel.app](https://temporary-sonic-dune-ubv08dc.vercel.app) (이 저장소의 최신 커밋이 반영되지 않았을 수 있습니다)
