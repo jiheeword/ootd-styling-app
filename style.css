@@ -4071,3 +4071,44 @@ body.force-mobile-mode .mode-pill {
   white-space: nowrap;
   padding: 10px 14px;
 }
+
+/* 로고 아이콘 순환 애니메이션 (옷걸이·반지·상의·하의·립스틱, 각 2초) */
+.logo-icon-box {
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-anim-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 58%;
+  height: 58%;
+  margin: -29% 0 0 -29%;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  animation: logoIconCycle 10s infinite;
+}
+
+.logo-anim-icon:nth-child(2) { animation-delay: 2s; }
+.logo-anim-icon:nth-child(3) { animation-delay: 4s; }
+.logo-anim-icon:nth-child(4) { animation-delay: 6s; }
+.logo-anim-icon:nth-child(5) { animation-delay: 8s; }
+
+@keyframes logoIconCycle {
+  0% { opacity: 0; transform: scale(0.5) rotate(-25deg); }
+  4% { opacity: 1; transform: scale(1.1) rotate(0deg); }
+  7% { transform: scale(1); }
+  17% { opacity: 1; transform: scale(1) rotate(0deg); }
+  21% { opacity: 0; transform: scale(0.5) rotate(25deg); }
+  100% { opacity: 0; transform: scale(0.5) rotate(25deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-anim-icon { animation: none; }
+  .logo-anim-icon:first-child { opacity: 1; }
+}
