@@ -1,5 +1,8 @@
 /**
- * OOTD HOUSE - Today's House (오늘의집) Inspired Fashion Platform JavaScript
+ * OOTD 오늘의 코디 - 나와 비슷한 사람의 실제 코디로, 실패 없는 옷 쇼핑 (MVP BETA)
+ *
+ * 현재 구현: 피드·커뮤니티·사진 미리보기·자가응답 기반 스타일 분석·기본 프로필 매칭(localStorage)
+ * 데모/예시: 쇼룸 상품, 상품 URL 분석, 가격·품절 알림 (실제 AI 모델·쇼핑몰 API 연동 없음)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -26,20 +29,26 @@ document.addEventListener('DOMContentLoaded', () => {
     aiStep: 0,
     isRecording: false,
     recognition: null,
+    // 피드 게시물은 MVP 검증용 예시 데이터입니다.
+    // 착용자 키·상하의 사이즈·체형·퍼스널컬러·착용 후기를 담아 '나와 비슷한 사람' 매칭에 사용합니다.
     posts: [
       {
         id: 'post-1',
         author: '소희_데일리',
         avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80',
-        specs: '163cm · 48kg · 여름쿨톤',
+        ageLabel: '40대',
+        height: 163,
+        topSize: 'S',
+        bottomSize: '26',
         category: '출근룩',
         tone: '여름쿨톤',
-        bodyType: '웨이브체형',
+        bodyType: '웨이브',
         image: 'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=800&q=80',
-        desc: '월요일 출근할 때 가장 손이 많이 가는 쿨톤 조합이에요! 차분한 소라색 셔츠에 하이웨이스트 슬랙스로 다리가 5cm는 더 길어 보여요 💙',
+        desc: '월요일 출근할 때 가장 손이 많이 가는 쿨톤 조합이에요! 차분한 소라색 셔츠에 하이웨이스트 슬랙스로 다리가 길어 보여요 💙',
+        review: '셔츠 S는 어깨가 딱 맞았고, 슬랙스 26은 허리가 살짝 남아서 벨트로 잡아줬어요.',
         items: [
-          { brand: 'COS', title: '파인 팝클린 오버사이즈 셔츠', price: '115,000' },
-          { brand: 'ZARA', title: '플루이드 와이드 하이라이즈 팬츠', price: '59,900' }
+          { brand: 'COS', title: '파인 팝클린 오버사이즈 셔츠', size: 'S', price: '115,000' },
+          { brand: 'ZARA', title: '플루이드 와이드 하이라이즈 팬츠', size: '26', price: '59,900' }
         ],
         likes: 142,
         isLiked: false,
@@ -54,15 +63,19 @@ document.addEventListener('DOMContentLoaded', () => {
         id: 'post-2',
         author: '수현_모던',
         avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=150&q=80',
-        specs: '168cm · 53kg · 가을웜톤',
+        ageLabel: '30대',
+        height: 168,
+        topSize: 'M',
+        bottomSize: '28',
         category: '데이트룩',
         tone: '가을웜톤',
         bodyType: '스트레이트',
         image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80',
         desc: '가을 웜톤을 위한 카멜 니트 & A라인 플리츠 스커트 매칭. 허리선 똑 떨어지는 정핏 니트라 상체 부해 보이지 않아서 대만족!',
+        review: '니트는 평소대로 M, 스커트는 28이 허리에 딱 맞고 길이는 무릎 아래로 떨어져요.',
         items: [
-          { brand: 'MASSIMO DUTTI', title: '100% 캐시미어 크루넥 니트', price: '219,000' },
-          { brand: 'MANGO', title: '플리츠 미디 스커트', price: '79,000' }
+          { brand: 'MASSIMO DUTTI', title: '캐시미어 크루넥 니트', size: 'M', price: '219,000' },
+          { brand: 'MANGO', title: '플리츠 미디 스커트', size: '28', price: '79,000' }
         ],
         likes: 219,
         isLiked: false,
@@ -76,15 +89,19 @@ document.addEventListener('DOMContentLoaded', () => {
         id: 'post-3',
         author: '유진_클래식',
         avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
-        specs: '161cm · 46kg · 봄웜톤',
+        ageLabel: '40대',
+        height: 161,
+        topSize: 'S',
+        bottomSize: '25',
         category: '출근룩',
         tone: '봄웜톤',
-        bodyType: '웨이브체형',
+        bodyType: '웨이브',
         image: 'https://images.unsplash.com/photo-1550614000-4895a10e1bfd?auto=format&fit=crop&w=800&q=80',
         desc: '키작녀 웨이브 체형의 크롭 자켓 활용법! 상의를 짧게 입고 목걸이로 시선을 위로 끌어올리면 비율이 확 살아나요 ✨',
+        review: '크롭 자켓 S는 팔 길이가 딱 맞았어요. 온라인에서 M 샀다가 어깨가 커서 교환했던 경험이 있어요.',
         items: [
-          { brand: '스파오', title: '클래식 트위드 크롭 자켓', price: '69,900' },
-          { brand: '골든듀', title: '18K 옐로우골드 쁘띠 네크리스', price: '380,000' }
+          { brand: '스파오', title: '클래식 트위드 크롭 자켓', size: 'S', price: '69,900' },
+          { brand: '골든듀', title: '옐로우골드 쁘띠 네크리스', size: '40cm', price: '380,000' }
         ],
         likes: 95,
         isLiked: false,
@@ -98,15 +115,19 @@ document.addEventListener('DOMContentLoaded', () => {
         id: 'post-4',
         author: '다은_미니멀',
         avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
-        specs: '165cm · 51kg · 여름쿨톤',
+        ageLabel: '30대',
+        height: 165,
+        topSize: 'M',
+        bottomSize: '27',
         category: '주얼리포인트',
         tone: '여름쿨톤',
-        bodyType: '웨이브체형',
+        bodyType: '웨이브',
         image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80',
-        desc: '단추 두 개 푼 린넨 셔츠에 실버925 드롭 이어링으로 완성한 주말 브런치룩. 쇄골 드러내니까 목선이 훨씬 시원해 보여요.',
+        desc: '단추 두 개 푼 린넨 셔츠에 실버 드롭 이어링으로 완성한 주말 브런치룩. 쇄골 드러내니까 목선이 훨씬 시원해 보여요.',
+        review: '린넨 셔츠 M은 여유 있게 떨어져서 하체 쪽 라인까지 자연스럽게 덮어줘요.',
         items: [
-          { brand: '아르켓', title: '릴렉스드 리넨 셔츠', price: '89,000' },
-          { brand: '스톤헨지', title: '실버925 드롭 이어링', price: '128,000' }
+          { brand: '아르켓', title: '릴렉스드 리넨 셔츠', size: 'M', price: '89,000' },
+          { brand: '스톤헨지', title: '실버 드롭 이어링', size: '원사이즈', price: '128,000' }
         ],
         likes: 180,
         isLiked: false,
@@ -114,6 +135,58 @@ document.addEventListener('DOMContentLoaded', () => {
         isScrapped: false,
         comments: [
           { author: '현주', text: '이어링 정보 여쭤봐도 될까요? 너무 청순해요!' }
+        ]
+      },
+      {
+        id: 'post-5',
+        author: '정아_오피스',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+        ageLabel: '40대',
+        height: 164,
+        topSize: 'M',
+        bottomSize: '28',
+        category: '출근룩',
+        tone: '여름쿨톤',
+        bodyType: '웨이브',
+        image: 'https://images.unsplash.com/photo-1583846717393-dc2412c95ed7?auto=format&fit=crop&w=800&q=80',
+        desc: '출산 후 체형이 바뀌면서 하의 고르기가 제일 어려웠는데, 허리선이 높은 버튼 스커트에 블라우스를 넣어 입는 걸로 정착했어요.',
+        review: '예전엔 27이었는데 지금은 28이 편해요. 이 스커트는 정사이즈로 가도 골반이 끼지 않았어요.',
+        items: [
+          { brand: 'COS', title: '리본 타이 블라우스', size: 'M', price: '89,000' },
+          { brand: '프론트로우', title: '하이웨이스트 버튼 스커트', size: '28', price: '148,000' }
+        ],
+        likes: 203,
+        isLiked: false,
+        scraps: 167,
+        isScrapped: false,
+        comments: [
+          { author: '선영', text: '저도 164에 28이라 너무 참고돼요! 앉았을 때 허리 조이지 않나요?' }
+        ]
+      },
+      {
+        id: 'post-6',
+        author: '미경_주말',
+        avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80',
+        ageLabel: '50대',
+        height: 158,
+        topSize: 'L',
+        bottomSize: '30',
+        category: '데이트룩',
+        tone: '겨울쿨톤',
+        bodyType: '내추럴',
+        image: 'https://images.unsplash.com/photo-1554412933-514a83d2f3c8?auto=format&fit=crop&w=800&q=80',
+        desc: '어깨 프레임이 있는 편이라 몸에 붙는 옷보다 여유 있는 롱 원피스가 편해요. 블랙 원피스에 챙 넓은 모자로 포인트!',
+        review: '모델 사진보다 기장이 길게 나와요. 158cm면 발목까지 내려와서 굽 있는 신발을 추천해요.',
+        items: [
+          { brand: '르베이지', title: '릴렉스드 롱 원피스', size: 'L', price: '298,000' },
+          { brand: '헬렌카민스키', title: '울 와이드 브림 햇', size: '57cm', price: '359,000' }
+        ],
+        likes: 88,
+        isLiked: false,
+        scraps: 61,
+        isScrapped: false,
+        comments: [
+          { author: '은정', text: '기장 정보 너무 유용해요. 저도 키가 작아서 늘 고민이었어요.' }
         ]
       }
     ],
@@ -152,32 +225,43 @@ document.addEventListener('DOMContentLoaded', () => {
         id: 'comm-4',
         category: '세일정보',
         title: '🏷️ COS(코스) 미드 시즌 세일 시작! 쿨톤 니트 건질 거 많네요',
-        body: '파인 울 보트넥 니트 30% 세일 들어갔어요! 제 장바구니에 담아둔 거 알림 떠서 바로 샀습니다 ㅎㅎ 품절 빠르니 얼른 가보세요.',
+        body: '파인 울 보트넥 니트 30% 세일 들어갔어요! 세일 소식 보고 바로 샀습니다 ㅎㅎ 품절 빠르니 얼른 가보세요.',
         author: '쇼퍼홀릭',
         likes: 41,
         commentsCount: 13,
         time: '5시간 전'
       }
     ],
+    // 내 매칭 프로필 (백엔드가 없어 localStorage에 저장)
     userProfile: {
       gender: 'female', // 'female' | 'male'
-      ageGroup: '30s',  // '20s' | '30s' | '40s'
+      ageGroup: '40s',  // '20s' | '30s' | '40s'
       height: 164,
-      weight: 49
+      weight: null,     // 선택사항
+      topSize: 'M',
+      bottomSize: '28',
+      bodyType: '웨이브', // '웨이브' | '스트레이트' | '내추럴'
+      tone: '여름쿨톤',   // '봄웜톤' | '여름쿨톤' | '가을웜톤' | '겨울쿨톤' | ''
+      styles: ['오피스', '미니멀'],
+      saved: false      // 사용자가 직접 저장했는지 여부
     },
+    // 자가응답 문진 답변과 그 집계 결과
+    diagnosisAnswers: { metal: null, sunburn: null, contrast: null, body: null, neckline: null },
+    diagnosis: {
+      completed: false,
+      source: 'default', // 'default' | 'answers' | 'manual'
+      body: '웨이브',
+      tally: { cool: 0, warm: 0, tie: false }
+    },
+    photoInputs: { face: null, body: null },
     currentPersona: 'summer_cool_wave',
     femalePersonas: {
       summer_cool_wave: {
         key: 'summer_cool_wave',
         toneName: '여름 쿨 뮤트',
         bodyName: '웨이브 골격',
-        badge: 'AI PERSONAL REPORT',
         title: '여성 고객님을 위한 여름 쿨 뮤트 & 웨이브 체형 솔루션',
         desc: '노란기를 뺀 부드러운 라벤더·스카이블루와 하이웨이스트 A라인 실루엣이 결점을 가리고 장점을 극대화합니다.',
-        skinRgb: 'RGB(232, 209, 197)',
-        skinLab: 'Lab(85, 8, 8)',
-        skinToneClass: 'Cool Mute (쿨톤)',
-        swatchBg: '#e8d1c5',
         paletteDots: [
           { color: '#8b9dc3', name: '더스티 스카이' },
           { color: '#b39eb5', name: '라벤더 포그' },
@@ -250,13 +334,8 @@ document.addEventListener('DOMContentLoaded', () => {
         key: 'spring_warm_straight',
         toneName: '봄 웜 브라이트',
         bodyName: '스트레이트 골격',
-        badge: 'SPRING WARM VIP REPORT',
         title: '여성 고객님을 위한 봄 웜 브라이트 & 스트레이트 체형 솔루션',
         desc: '생기 넘치는 코랄 핑크와 피치, 군더더기 없는 정핏 브이넥과 싱글 자켓이 볼륨감 있는 상체를 날씬하게 정돈합니다.',
-        skinRgb: 'RGB(246, 218, 192)',
-        skinLab: 'Lab(88, 14, 22)',
-        skinToneClass: 'Warm Bright (웜톤)',
-        swatchBg: '#f6dac0',
         paletteDots: [
           { color: '#ff8a7a', name: '생기 코랄' },
           { color: '#ffb997', name: '피치 블러셔' },
@@ -329,13 +408,8 @@ document.addEventListener('DOMContentLoaded', () => {
         key: 'autumn_warm_natural',
         toneName: '가을 웜 딥 & 뮤트',
         bodyName: '내추럴 골격',
-        badge: 'AUTUMN DEEP VIP REPORT',
         title: '여성 고객님을 위한 가을 웜 딥 & 내추럴 체형 솔루션',
         desc: '깊이감 있는 카멜 베이지와 올리브 카키, 골격미를 시크하게 살려주는 오버사이즈 롱코트와 와이드 치노 팬츠의 조합입니다.',
-        skinRgb: 'RGB(212, 172, 142)',
-        skinLab: 'Lab(72, 16, 26)',
-        skinToneClass: 'Warm Deep (웜톤)',
-        swatchBg: '#d4ac8e',
         paletteDots: [
           { color: '#b47b48', name: '카멜 골드' },
           { color: '#556b2f', name: '올리브 카키' },
@@ -408,13 +482,8 @@ document.addEventListener('DOMContentLoaded', () => {
         key: 'winter_cool_straight',
         toneName: '겨울 쿨 딥 & 비비드',
         bodyName: '스트레이트 골격',
-        badge: 'WINTER VIVID VIP REPORT',
         title: '여성 고객님을 위한 겨울 쿨 딥 & 스트레이트 체형 솔루션',
         desc: '강렬한 젯 블랙과 퓨어 화이트의 선명한 대비감, 칼각으로 떨어지는 테일러드 핏이 도회적인 분위기를 극대화합니다.',
-        skinRgb: 'RGB(222, 224, 232)',
-        skinLab: 'Lab(78, 4, -9)',
-        skinToneClass: 'Cool Vivid (쿨톤)',
-        swatchBg: '#dee0e8',
         paletteDots: [
           { color: '#090a0f', name: '젯 블랙' },
           { color: '#ffffff', name: '퓨어 스노우' },
@@ -489,13 +558,8 @@ document.addEventListener('DOMContentLoaded', () => {
         key: 'summer_cool_wave',
         toneName: '여름 쿨 뮤트 (남성)',
         bodyName: '슬림·웨이브 골격',
-        badge: 'MEN COOL MINIMAL REPORT',
         title: '남성 고객님을 위한 여름 쿨 뮤트 & 슬림 테이퍼드 솔루션',
         desc: '도시적인 차콜과 쿨네이비, 쇄골을 단정하게 감싸는 크루넥과 슬림 테이퍼드 슬랙스가 깔끔하고 지적인 무드를 연출합니다.',
-        skinRgb: 'RGB(226, 220, 215)',
-        skinLab: 'Lab(82, 4, 2)',
-        skinToneClass: 'Cool Mute (남성 쿨톤)',
-        swatchBg: '#e2dcd7',
         paletteDots: [
           { color: '#1e293b', name: '다크 네이비' },
           { color: '#64748b', name: '슬레이트 그레이' },
@@ -568,13 +632,8 @@ document.addEventListener('DOMContentLoaded', () => {
         key: 'spring_warm_straight',
         toneName: '봄 웜 브라이트 (남성)',
         bodyName: '스트레이트 골격 (탄탄 체형)',
-        badge: 'MEN SPRING CASUAL REPORT',
         title: '남성 고객님을 위한 봄 웜 브라이트 & 테일러드 치노 솔루션',
         desc: '생동감 있는 오트밀과 피치 베이지, 어깨 각을 샤프하게 살려주는 테일러드 자켓과 크림 치노 팬츠가 활력과 호감을 줍니다.',
-        skinRgb: 'RGB(242, 214, 186)',
-        skinLab: 'Lab(85, 12, 18)',
-        skinToneClass: 'Warm Bright (남성 웜톤)',
-        swatchBg: '#f2d6ba',
         paletteDots: [
           { color: '#ea580c', name: '브릭 오렌지' },
           { color: '#fb923c', name: '웜 애프리콧' },
@@ -647,13 +706,8 @@ document.addEventListener('DOMContentLoaded', () => {
         key: 'autumn_warm_natural',
         toneName: '가을 웜 딥 & 뮤트 (남성)',
         bodyName: '내추럴 골격 (프레임 체형)',
-        badge: 'MEN AUTUMN GENTLE REPORT',
         title: '남성 고객님을 위한 가을 웜 딥 & 오버 발마칸 코트 솔루션',
         desc: '깊이감 넘치는 카멜과 올리브 카키, 넓은 어깨 프레임을 남성답게 살려주는 롱 발마칸 코트와 와이드 치노의 멋스러운 앙상블입니다.',
-        skinRgb: 'RGB(208, 168, 138)',
-        skinLab: 'Lab(70, 14, 24)',
-        skinToneClass: 'Warm Deep (남성 웜톤)',
-        swatchBg: '#d0a88a',
         paletteDots: [
           { color: '#78350f', name: '딥 카멜' },
           { color: '#3f6212', name: '올리브 포레스트' },
@@ -726,13 +780,8 @@ document.addEventListener('DOMContentLoaded', () => {
         key: 'winter_cool_straight',
         toneName: '겨울 쿨 딥 & 비비드 (남성)',
         bodyName: '스트레이트 골격 (포멀 체형)',
-        badge: 'MEN WINTER LUXURY REPORT',
         title: '남성 고객님을 위한 겨울 쿨 딥 & 솔리드 옴므 블랙 수트 솔루션',
         desc: '차갑고 선명한 젯 블랙과 스노우 화이트의 하이 콘트라스트, 칼각 테일러드 핏이 도시적인 럭셔리 무드를 완성합니다.',
-        skinRgb: 'RGB(218, 222, 230)',
-        skinLab: 'Lab(75, 2, -8)',
-        skinToneClass: 'Cool Vivid (남성 쿨톤)',
-        swatchBg: '#dadee6',
         paletteDots: [
           { color: '#000000', name: '젯 블랙' },
           { color: '#ffffff', name: '퓨어 스노우' },
@@ -811,6 +860,103 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // =========================================================================
+  // 1-1. 공통 헬퍼: 저장소, 표시 라벨, 기본 프로필 매칭 점수
+  // =========================================================================
+  const PROFILE_KEY = 'ootd_my_profile_v1';
+  const DIAGNOSIS_KEY = 'ootd_style_diagnosis_v1';
+
+  const readStore = (key) => {
+    try {
+      return JSON.parse(localStorage.getItem(key) || 'null');
+    } catch (e) {
+      return null;
+    }
+  };
+  const writeStore = (key, value) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      console.warn('localStorage 저장 실패:', e);
+    }
+  };
+
+  const escapeHtml = (text) => String(text ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+
+  const TOP_SIZES = [['XS', 'XS (44)'], ['S', 'S (55)'], ['M', 'M (66)'], ['L', 'L (77)'], ['XL', 'XL (88)']];
+  const BOTTOM_SIZES = ['24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34'];
+
+  // 퍼스널컬러 ↔ 결과 페르소나(상품·팔레트 묶음) 매핑
+  const PERSONA_TONE = {
+    spring_warm_straight: '봄웜톤',
+    summer_cool_wave: '여름쿨톤',
+    autumn_warm_natural: '가을웜톤',
+    winter_cool_straight: '겨울쿨톤'
+  };
+  const TONE_PERSONA = Object.fromEntries(Object.entries(PERSONA_TONE).map(([k, v]) => [v, k]));
+
+  // 체형별 설명은 해당 체형을 대표하는 페르소나 데이터에서 가져온다
+  const BODY_PERSONA = {
+    '웨이브': 'summer_cool_wave',
+    '스트레이트': 'spring_warm_straight',
+    '내추럴': 'autumn_warm_natural'
+  };
+
+  const TONE_SUMMARY = {
+    summer_cool_wave: '노란기를 뺀 라벤더·스카이블루·뮤트 로즈처럼 부드럽고 맑은 쿨 컬러가 얼굴을 환하게 해줘요.',
+    spring_warm_straight: '코랄 핑크·피치·라이트 버터처럼 밝고 따뜻한 컬러가 생기를 더해줘요.',
+    autumn_warm_natural: '카멜·올리브 카키·테라코타처럼 깊이감 있는 웜 컬러가 차분하고 고급스러운 인상을 만들어줘요.',
+    winter_cool_straight: '블랙·퓨어 화이트·코발트처럼 선명하고 대비가 강한 쿨 컬러가 또렷한 인상을 살려줘요.'
+  };
+
+  const toneLabel = (tone) => (tone || '').replace(/(봄|여름|가을|겨울)(웜톤|쿨톤)/, '$1 $2');
+  const ageLabelOf = (ageGroup) => ({ '20s': '20대', '30s': '30대', '40s': '40대+' }[ageGroup] || '');
+
+  const loadProfile = () => {
+    const saved = readStore(PROFILE_KEY);
+    if (saved && typeof saved === 'object') {
+      Object.assign(state.userProfile, saved);
+    }
+  };
+
+  const saveProfile = (markSaved = false) => {
+    if (markSaved) state.userProfile.saved = true;
+    writeStore(PROFILE_KEY, state.userProfile);
+  };
+
+  // 기본 프로필 매칭 점수 (AI 정확도가 아닌 규칙 기반 점수, 100점 만점)
+  const scoreSimilarity = (profile, post) => {
+    let score = 0;
+    const reasons = [];
+    const bodyMatch = !!profile.bodyType && profile.bodyType === post.bodyType;
+    const toneMatch = !!profile.tone && profile.tone === post.tone;
+    if (bodyMatch) { score += 35; reasons.push('체형'); }
+    if (toneMatch) { score += 25; reasons.push('퍼스널컬러'); }
+    if (profile.height && post.height) {
+      const diff = Math.abs(profile.height - post.height);
+      if (diff <= 3) { score += 20; reasons.push('키 ±3cm'); }
+      else if (diff <= 7) { score += 10; reasons.push('키 ±7cm'); }
+    }
+    if (profile.topSize && profile.topSize === post.topSize) { score += 10; reasons.push('상의 사이즈'); }
+    if (profile.bottomSize && profile.bottomSize === post.bottomSize) { score += 10; reasons.push('하의 사이즈'); }
+
+    let label = '';
+    if (bodyMatch && toneMatch) label = '나와 체형·톤 유사';
+    else if (bodyMatch) label = '나와 체형 유사';
+    else if (toneMatch) label = '나와 톤 유사';
+
+    return { score, reasons, label };
+  };
+
+  const profileChipsHtml = (p) => `
+    <span class="fit-chip strong">${escapeHtml(p.height)}cm</span>
+    <span class="fit-chip">상의 ${escapeHtml(p.topSize || '-')} / 하의 ${escapeHtml(p.bottomSize || '-')}</span>
+    <span class="fit-chip">${escapeHtml(p.bodyType)} 체형</span>
+    ${p.tone ? `<span class="fit-chip tone">${escapeHtml(toneLabel(p.tone))}</span>` : ''}
+  `;
+
+  // =========================================================================
   // 2. 뷰 전환 및 네비게이션 (Feed / AI / Community)
   // =========================================================================
   window.switchNav = (targetId) => {
@@ -865,47 +1011,76 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // =========================================================================
-  // 3. OOTD 패션 피드 렌더링 (오늘의집 인테리어 자랑 스타일)
+  // 3. OOTD 패션 피드 렌더링 (나와 비슷한 사람의 실제 착장)
   // =========================================================================
+  const itemName = (item) => [item.brand, item.title].filter(Boolean).join(' ');
+
+  const pinHtml = (item, pinClass) => item ? `
+    <div class="item-tag-pin ${pinClass}" onclick="event.stopPropagation();">
+      <span class="pin-dot"></span>
+      <div class="pin-popover">
+        <span class="pin-brand">${escapeHtml(item.brand || '착용 제품')}</span>
+        <strong class="pin-title">${escapeHtml(item.title)}</strong>
+        <span class="pin-price">${item.size ? `사이즈 ${escapeHtml(item.size)}` : ''}${item.price ? ` · ₩ ${escapeHtml(item.price)}` : ''}</span>
+      </div>
+    </div>
+  ` : '';
+
+  const postMatchesFilter = (post, filter) => {
+    if (filter === 'all' || filter === 'similar') return true;
+    return post.category === filter ||
+           post.tone.includes(filter) ||
+           filter.includes(post.bodyType);
+  };
+
+  const renderSimilarInfoBar = () => {
+    const bar = document.getElementById('similar-info-bar');
+    if (!bar) return;
+    const isSimilar = state.feedFilter === 'similar';
+    bar.style.display = isSimilar ? 'flex' : 'none';
+    if (!isSimilar) return;
+    bar.innerHTML = `
+      <div class="similar-info-main">
+        <strong>👯 기본 프로필 매칭 점수가 높은 순으로 정렬했어요</strong>
+        <span>체형 일치 35 · 퍼스널컬러 일치 25 · 키 ±3cm 20 (±7cm 10) · 상의 사이즈 10 · 하의 사이즈 10 — AI 정확도가 아닌 규칙 기반 점수입니다.</span>
+        <div class="fit-spec-chips">내 프로필: ${profileChipsHtml(state.userProfile)}</div>
+      </div>
+      <button type="button" class="result-edit-btn" onclick="openProfileModal()"><i data-lucide="user-cog"></i> 프로필 수정</button>
+    `;
+  };
+
   const renderFeed = () => {
     const feedGrid = document.getElementById('feed-grid');
     if (!feedGrid) return;
     feedGrid.innerHTML = '';
 
-    const filtered = state.posts.filter(post => {
-      if (state.feedFilter === 'all') return true;
-      return post.category === state.feedFilter || 
-             post.tone.includes(state.feedFilter) || 
-             post.bodyType.includes(state.feedFilter);
-    });
+    const profile = state.userProfile;
+    let entries = state.posts
+      .filter(post => postMatchesFilter(post, state.feedFilter))
+      .map(post => ({ post, match: profile.saved ? scoreSimilarity(profile, post) : null }));
 
-    filtered.forEach(post => {
+    if (state.feedFilter === 'similar') {
+      entries = entries.sort((a, b) => b.match.score - a.match.score);
+    }
+
+    renderSimilarInfoBar();
+
+    if (entries.length === 0) {
+      feedGrid.innerHTML = '<p class="feed-empty">이 조건에 맞는 코디가 아직 없어요. 다른 필터를 선택해보세요.</p>';
+    }
+
+    entries.forEach(({ post, match }) => {
       const card = document.createElement('div');
       card.className = 'feed-card';
       card.innerHTML = `
         <div class="feed-img-box" onclick="openOotdDetail('${post.id}')">
-          <img src="${post.image}" alt="${post.desc}" loading="lazy">
-          <span class="card-tag-badge">${post.category}</span>
-          
-          <!-- 오늘의집 스타일 착장 태그 핀 -->
-          <div class="item-tag-pin pin-1" onclick="event.stopPropagation();">
-            <span class="pin-dot"></span>
-            <div class="pin-popover">
-              <span class="pin-brand">${post.items[0]?.brand || 'BRAND'}</span>
-              <strong class="pin-title">${post.items[0]?.title || '아이템'}</strong>
-              <span class="pin-price">₩ ${post.items[0]?.price || '0'}</span>
-            </div>
-          </div>
-          ${post.items[1] ? `
-            <div class="item-tag-pin pin-2" onclick="event.stopPropagation();">
-              <span class="pin-dot"></span>
-              <div class="pin-popover">
-                <span class="pin-brand">${post.items[1].brand}</span>
-                <strong class="pin-title">${post.items[1].title}</strong>
-                <span class="pin-price">₩ ${post.items[1].price}</span>
-              </div>
-            </div>
-          ` : ''}
+          <img src="${escapeHtml(post.image)}" alt="${escapeHtml(post.desc)}" loading="lazy">
+          <span class="card-tag-badge">${escapeHtml(post.category)}</span>
+          ${state.feedFilter === 'similar' ? `<span class="card-match-score" title="기본 프로필 매칭 점수 (규칙 기반)">매칭 ${match.score}점</span>` : ''}
+
+          <!-- 착장 태그 핀 -->
+          ${pinHtml(post.items[0], 'pin-1')}
+          ${pinHtml(post.items[1], 'pin-2')}
 
           <button class="card-scrap-btn ${post.isScrapped ? 'scrapped' : ''}" onclick="event.stopPropagation(); toggleCardScrap('${post.id}', this)" title="스크랩">
             <i data-lucide="bookmark"></i>
@@ -914,13 +1089,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         <div class="feed-card-body" onclick="openOotdDetail('${post.id}')">
           <div class="feed-user-meta">
-            <img src="${post.avatar}" alt="${post.author}" class="feed-user-avatar">
-            <span class="feed-user-name">${post.author}</span>
-            <span class="feed-user-specs">• ${post.specs}</span>
+            <img src="${escapeHtml(post.avatar)}" alt="${escapeHtml(post.author)}" class="feed-user-avatar">
+            <span class="feed-user-name">${escapeHtml(post.author)}</span>
+            <span class="feed-user-specs">• ${escapeHtml(post.ageLabel)}</span>
           </div>
-          <p class="feed-card-desc">${post.desc}</p>
+          ${match?.label ? `<span class="similar-badge"><i data-lucide="users"></i> ${match.label}</span>` : ''}
+          <div class="fit-spec-chips">${profileChipsHtml(post)}</div>
+          <p class="feed-card-desc">${escapeHtml(post.desc)}</p>
+          ${post.review ? `<p class="feed-fit-review">💬 ${escapeHtml(post.review)}</p>` : ''}
           <div class="feed-item-tags-snippet">
-            🏷️ ${post.items.map(i => `${i.brand} ${i.title}`).join(' / ')}
+            🏷️ ${post.items.map(i => escapeHtml(itemName(i) + (i.size ? ` (${i.size})` : ''))).join(' / ')}
           </div>
           <div class="feed-card-footer">
             <div class="stat-group">
@@ -942,18 +1120,34 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   window.applyFeedFilter = (filterKey, el) => {
+    if (filterKey === 'similar' && !state.userProfile.saved) {
+      openProfileModal();
+      showToast('info', '내 프로필이 필요해요', '키·사이즈·체형·퍼스널컬러를 저장하면 나와 비슷한 사람의 코디를 먼저 보여드려요.');
+      return;
+    }
     state.feedFilter = filterKey;
-    document.querySelectorAll('.filter-chip').forEach(btn => btn.classList.remove('active'));
-    if (el) el.classList.add('active');
+    document.querySelectorAll('.filter-chip').forEach(btn => {
+      btn.classList.toggle('active', el ? btn === el : btn.dataset.filter === filterKey);
+    });
     renderFeed();
   };
 
   window.filterByTone = (tone) => {
-    state.feedFilter = tone;
-    document.querySelectorAll('.filter-chip').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.filter === tone);
-    });
-    renderFeed();
+    applyFeedFilter(tone);
+  };
+
+  window.showSimilarFeed = () => {
+    if (state.currentNav !== 'feed') switchNav('feed');
+    applyFeedFilter('similar');
+    if (state.feedFilter === 'similar') {
+      setTimeout(() => {
+        const bar = document.getElementById('similar-info-bar');
+        if (!bar) return;
+        // 고정 헤더(68px)와 필터 바 높이만큼 여유를 둔다
+        const top = bar.getBoundingClientRect().top + window.scrollY - 150;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }, 80);
+    }
   };
 
   window.toggleCardScrap = (postId, btn) => {
@@ -977,15 +1171,39 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('detail-img').src = post.image;
     document.getElementById('detail-author-avatar').src = post.avatar;
     document.getElementById('detail-author-name').textContent = post.author;
-    document.getElementById('detail-author-specs').textContent = post.specs;
     document.getElementById('detail-desc').textContent = post.desc;
+
+    const match = state.userProfile.saved ? scoreSimilarity(state.userProfile, post) : null;
+    document.getElementById('detail-author-specs').textContent = match
+      ? `${post.ageLabel} · 기본 프로필 매칭 ${match.score}점${match.label ? ` · ${match.label}` : ''}`
+      : post.ageLabel;
+    document.getElementById('detail-fit-chips').innerHTML = profileChipsHtml(post);
+
+    const reviewEl = document.getElementById('detail-review');
+    reviewEl.style.display = post.review ? 'block' : 'none';
+    reviewEl.innerHTML = post.review ? `<strong>💬 실제 착용 후기</strong><p>${escapeHtml(post.review)}</p>` : '';
+
+    // 사진 위 태그 핀을 이 게시물의 착용 제품으로 채움
+    [1, 2].forEach(n => {
+      const item = post.items[n - 1];
+      const pin = document.getElementById(`tag-pin-${n}`);
+      if (pin) pin.style.display = item ? '' : 'none';
+      const pop = document.getElementById(`pin-popover-${n}`);
+      if (pop && item) {
+        pop.innerHTML = `
+          <span class="pin-brand">${escapeHtml(item.brand || '착용 제품')}</span>
+          <strong class="pin-title">${escapeHtml(item.title)}</strong>
+          <span class="pin-price">${item.size ? `사이즈 ${escapeHtml(item.size)}` : ''}${item.price ? ` · ₩ ${escapeHtml(item.price)}` : ''}</span>
+        `;
+      }
+    });
 
     // 착장 아이템 목록
     const itemsListEl = document.getElementById('detail-items-list');
     itemsListEl.innerHTML = post.items.map(item => `
       <div style="font-size:12.5px; padding:4px 0;">
-        <span style="color:var(--primary); font-weight:700;">[${item.brand}]</span> 
-        <strong>${item.title}</strong> - ₩${item.price}
+        ${item.brand ? `<span style="color:var(--primary); font-weight:700;">[${escapeHtml(item.brand)}]</span>` : ''}
+        <strong>${escapeHtml(item.title)}</strong>${item.size ? ` · 착용 사이즈 <strong>${escapeHtml(item.size)}</strong>` : ''}${item.price ? ` - ₩${escapeHtml(item.price)}` : ''}
       </div>
     `).join('');
 
@@ -1003,7 +1221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const listEl = document.getElementById('detail-comments-list');
     listEl.innerHTML = state.activeDetailPost.comments.map(c => `
       <div class="comment-row">
-        <strong>${c.author}</strong> <span>${c.text}</span>
+        <strong>${escapeHtml(c.author)}</strong> <span>${escapeHtml(c.text)}</span>
       </div>
     `).join('');
   };
@@ -1067,15 +1285,43 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('post-img-url').value = imgEl.src;
   };
 
+  // 업로드 폼을 내 매칭 프로필 값으로 채움 (사용자가 이미 고친 값은 유지)
+  const prefillUploadForm = () => {
+    const modal = document.getElementById('upload-modal');
+    if (!modal || modal.dataset.dirty === 'true') return;
+    const p = state.userProfile;
+    document.getElementById('post-height').value = p.height || '';
+    document.getElementById('post-top-size').value = p.topSize || 'M';
+    document.getElementById('post-bottom-size').value = p.bottomSize || '28';
+    document.getElementById('post-body-type').value = p.bodyType || '웨이브';
+    document.getElementById('post-tone').value = p.tone || '여름쿨톤';
+  };
+  document.getElementById('upload-modal')?.addEventListener('input', (e) => {
+    e.currentTarget.dataset.dirty = 'true';
+  });
+
+  // "자라 크롭 가디건 (M) / 코스 슬랙스 (28)" → [{ title, size }]
+  const parseWornItems = (text) => text.split('/')
+    .map(part => part.trim())
+    .filter(Boolean)
+    .map(part => {
+      const m = part.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+      return { brand: '', title: m ? m[1] : part, size: m ? m[2] : '' };
+    });
+
   window.submitNewOotd = () => {
     const imgUrl = document.getElementById('post-img-url').value.trim();
-    const bodySpec = document.getElementById('post-body-spec').value.trim();
-    const toneSpec = document.getElementById('post-tone-spec').value.trim();
+    const height = parseInt(document.getElementById('post-height').value, 10);
     const tagItem = document.getElementById('post-tag-item').value.trim();
+    const review = document.getElementById('post-review').value.trim();
     const content = document.getElementById('post-content').value.trim();
 
     if (!imgUrl || !content) {
       alert('사진과 코디 코멘트를 입력해주세요!');
+      return;
+    }
+    if (!height || height < 130 || height > 200) {
+      alert('키를 130~200cm 사이로 입력해주세요. 나와 비슷한 사람 매칭에 사용됩니다.');
       return;
     }
 
@@ -1083,15 +1329,17 @@ document.addEventListener('DOMContentLoaded', () => {
       id: `post-${Date.now()}`,
       author: state.currentUser.nickname,
       avatar: state.currentUser.avatar,
-      specs: `${bodySpec} · ${toneSpec}`,
-      category: '출근룩',
-      tone: toneSpec.includes('쿨') ? '여름쿨톤' : '봄웜톤',
-      bodyType: toneSpec.includes('웨이브') ? '웨이브체형' : '스트레이트',
+      ageLabel: ageLabelOf(state.userProfile.ageGroup),
+      height,
+      topSize: document.getElementById('post-top-size').value,
+      bottomSize: document.getElementById('post-bottom-size').value,
+      category: document.getElementById('post-category').value,
+      tone: document.getElementById('post-tone').value,
+      bodyType: document.getElementById('post-body-type').value,
       image: imgUrl,
       desc: content,
-      items: [
-        { brand: '착장 브랜드', title: tagItem || '자라 크롭 니트', price: '49,000' }
-      ],
+      review,
+      items: parseWornItems(tagItem),
       likes: 1,
       isLiked: false,
       scraps: 0,
@@ -1099,11 +1347,14 @@ document.addEventListener('DOMContentLoaded', () => {
       comments: []
     };
 
-    // 피드 최상단 추가
+    // 피드 최상단 추가 (백엔드가 없어 새로고침하면 사라짐)
     state.posts.unshift(newPost);
+    document.getElementById('upload-modal').dataset.dirty = 'false';
+    document.getElementById('post-content').value = '';
+    document.getElementById('post-review').value = '';
     closeModal('upload-modal');
     renderFeed();
-    showToast('sale', '🎉 코디 자랑 완료!', '회원님의 OOTD가 오늘의 패션 피드에 등록되었습니다.');
+    showToast('sale', '🎉 코디 자랑 완료!', '피드에 등록되었습니다. (MVP: 게시물 DB가 없어 새로고침하면 사라져요)');
   };
 
   // =========================================================================
@@ -1122,16 +1373,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const card = document.createElement('div');
       card.className = 'comm-post-card';
       card.onclick = () => {
-        showToast('info', '게시글 열람', `[${p.category}] ${p.title}`);
+        showToast('info', '게시글 열람', escapeHtml(`[${p.category}] ${p.title}`));
       };
       card.innerHTML = `
-        <span class="comm-cat-badge">${p.category}</span>
-        <h4 class="comm-post-title">${p.title}</h4>
-        <p class="comm-post-body">${p.body}</p>
+        <span class="comm-cat-badge">${escapeHtml(p.category)}</span>
+        <h4 class="comm-post-title">${escapeHtml(p.title)}</h4>
+        <p class="comm-post-body">${escapeHtml(p.body)}</p>
         <div class="comm-post-footer">
           <div class="comm-author-box">
             <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" class="comm-author-avatar" alt="작성자">
-            <span>${p.author}</span> • <span>${p.time}</span>
+            <span>${escapeHtml(p.author)}</span> • <span>${escapeHtml(p.time)}</span>
           </div>
           <div class="comm-stats">
             <span><i data-lucide="thumbs-up"></i> ${p.likes}</span>
@@ -1182,49 +1433,112 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // =========================================================================
-  // 7. AI 퍼스널 카운슬링 로직 (3분 음성/대화 진단)
+  // 7. 자가응답 기반 퍼스널 스타일 문진 (응답을 저장하고 실제로 집계)
   // =========================================================================
+  const tallyUndertone = (answers) => {
+    let cool = 0;
+    let warm = 0;
+    [answers.metal, answers.sunburn].forEach(v => {
+      if (v === 'cool') cool++;
+      if (v === 'warm') warm++;
+    });
+    return { cool, warm };
+  };
+
   const aiSteps = [
     {
-      msg: `반갑습니다! OOTD 오늘의 코디 수석 스타일 AI 릴리예요 😊<br>
-            사진 촬영이 부담스러우셔도 괜찮아요. <strong>일상의 착용 습관과 피부 반응 4가지</strong>만 질문드릴게요!<br><br>
-            첫 번째입니다. <strong>거울을 보실 때 골드(노란 금) 목걸이가 화사하신가요, 아니면 실버/화이트골드를 차야 피부가 맑고 시원해 보이나요?</strong>`,
+      key: 'metal',
+      msg: () => `반갑습니다! OOTD 오늘의 코디 스타일 가이드 릴리예요 😊<br>
+            <strong>평소 착용 습관과 피부 반응에 대한 5가지 질문</strong>에 답해주시면, 응답을 집계해 퍼스널컬러·체형 방향을 정리해드릴게요.<br>
+            <span class="chat-mvp-note">※ MVP 버전: 자가응답과 기본 추천 규칙으로 결과를 만들며, AI 분석 모델은 개발·검증 예정입니다.</span><br><br>
+            첫 번째 질문입니다. <strong>골드(노란 금) 목걸이가 화사한가요, 아니면 실버/화이트골드를 해야 피부가 맑아 보이나요?</strong>`,
       options: [
-        { label: '✨ 은이나 백금이 훨씬 깨끗해 보여요 (실버)', val: 'cool' },
-        { label: '🌟 노란 골드가 피부에 따뜻하게 붙어요 (골드)', val: 'warm' },
-        { label: '🤔 둘 다 무난하고 로즈골드를 주로 껴요', val: 'neutral' }
+        { label: '✨ 은이나 백금이 훨씬 깨끗해 보여요 (실버)', val: 'cool', keywords: ['실버', '백금', '화이트골드', '은색', '은이'] },
+        { label: '🌟 노란 골드가 피부에 따뜻하게 붙어요 (골드)', val: 'warm', keywords: ['골드', '금', '노란'] },
+        { label: '🤔 둘 다 무난하고 로즈골드를 주로 껴요', val: 'neutral', keywords: ['로즈', '둘 다', '둘다', '무난', '모르'] }
       ]
     },
     {
-      msg: `피부의 언더톤(쿨/웜) 윤곽이 잡히고 있습니다!<br>
-            두 번째 질문이에요. <strong>여름철 햇볕에 피부가 탔을 때 주로 어떻게 반응하나요?</strong>`,
+      key: 'sunburn',
+      msg: () => `두 번째 질문이에요. <strong>여름철 햇볕에 피부가 탔을 때 주로 어떻게 반응하나요?</strong>`,
       options: [
-        { label: '☀️ 붉게 익고 따갑다가 벗겨져요 (쿨톤)', val: 'cool' },
-        { label: '🏖️ 붉은 기 없이 곧바로 까맣게 타요 (웜톤)', val: 'warm' }
+        { label: '☀️ 붉게 익고 따갑다가 벗겨져요', val: 'cool', keywords: ['붉', '빨갛', '빨개', '따갑', '벗겨'] },
+        { label: '🏖️ 붉은 기 없이 곧바로 까맣게 타요', val: 'warm', keywords: ['까맣', '까매', '검게', '그을', '갈색'] }
       ]
     },
     {
-      msg: `피부톤은 <strong>여름 쿨 뮤트</strong>로 확정되었습니다!<br>
-            이제 <strong>체형 골격 분석</strong>입니다. 체중이 늘었을 때 주로 <strong>어느 부위에 먼저 살이 붙나요?</strong>`,
+      key: 'contrast',
+      msg: (answers) => {
+        const { cool, warm } = tallyUndertone(answers);
+        return `지금까지 응답은 <strong>쿨 쪽 ${cool}개 · 웜 쪽 ${warm}개</strong>예요.<br>
+            세 번째 질문입니다. <strong>밝고 부드러운 컬러(라벤더·피치 등)와 진하고 선명한 컬러(버건디·카키·블랙 등) 중, 얼굴이 더 생기 있어 보이는 쪽은?</strong>`;
+      },
       options: [
-        { label: '🍐 엉덩이, 허벅지, 아랫배 등 하체 중심 (웨이브형)', val: 'wave' },
-        { label: '🍎 목덜미, 가슴, 윗배 등 상체 중심 (스트레이트형)', val: 'straight' },
-        { label: '🦴 몸 전체에 고루 붙거나 뼈마디가 도드라짐 (내추럴형)', val: 'natural' }
+        { label: '🌷 밝고 부드러운 파스텔 쪽이 잘 받아요', val: 'light', keywords: ['밝', '파스텔', '부드러', '연한', '연하'] },
+        { label: '🍷 진하고 선명한 컬러가 더 또렷해 보여요', val: 'deep', keywords: ['진하', '진한', '선명', '어두', '짙'] }
       ]
     },
     {
-      msg: `마지막 질문입니다! <strong>평소 셔츠를 입으실 때 윗단추를 1~2개 풀어 쇄골을 은은하게 보여주는 게 목이 길어 보이나요?</strong>`,
+      key: 'body',
+      msg: () => `이제 <strong>체형</strong> 질문입니다. 체중이 늘었을 때 주로 <strong>어느 부위에 먼저 살이 붙나요?</strong>`,
       options: [
-        { label: '🪞 단추를 풀어 쇄골을 보여줘야 시원하고 길어 보여요', val: 'open' },
-        { label: '👔 단추를 끝까지 단정하게 채우는 게 더 어울려요', val: 'closed' }
+        { label: '🍐 엉덩이, 허벅지, 아랫배 등 하체 중심 (웨이브형)', val: '웨이브', keywords: ['하체', '엉덩이', '허벅지', '아랫배', '웨이브'] },
+        { label: '🍎 목덜미, 가슴, 윗배 등 상체 중심 (스트레이트형)', val: '스트레이트', keywords: ['상체', '가슴', '윗배', '목덜미', '스트레이트'] },
+        { label: '🦴 몸 전체에 고루 붙거나 뼈마디가 도드라짐 (내추럴형)', val: '내추럴', keywords: ['전체', '고루', '골고루', '뼈', '내추럴'] }
+      ]
+    },
+    {
+      key: 'neckline',
+      msg: () => `마지막 질문입니다! <strong>셔츠 윗단추를 1~2개 풀어 쇄골을 보여주는 쪽과, 끝까지 단정하게 채우는 쪽 중 어느 쪽이 더 잘 어울리나요?</strong>`,
+      options: [
+        { label: '🪞 단추를 풀어 쇄골을 보여줘야 시원해 보여요', val: 'open', keywords: ['풀', '열', '쇄골', '시원'] },
+        { label: '👔 단추를 끝까지 단정하게 채우는 게 더 어울려요', val: 'closed', keywords: ['채우', '채워', '단정', '잠그', '잠가'] }
       ]
     }
   ];
 
-  const renderAiChatStep = () => {
+  // 응답 → 결과. 쿨/웜 동점이면 햇볕 반응(피부 반응) 응답을 우선한다.
+  const computeDiagnosis = (answers) => {
+    const { cool, warm } = tallyUndertone(answers);
+    const tie = cool === warm;
+    let undertone = cool > warm ? 'cool' : 'warm';
+    if (tie) undertone = answers.sunburn || 'cool';
+    const light = answers.contrast !== 'deep';
+
+    let personaKey;
+    if (undertone === 'cool') personaKey = light ? 'summer_cool_wave' : 'winter_cool_straight';
+    else personaKey = light ? 'spring_warm_straight' : 'autumn_warm_natural';
+
+    return {
+      personaKey,
+      body: answers.body || '웨이브',
+      tally: { cool, warm, tie }
+    };
+  };
+
+  const saveDiagnosis = () => {
+    writeStore(DIAGNOSIS_KEY, {
+      answers: state.diagnosisAnswers,
+      diagnosis: state.diagnosis,
+      personaKey: state.currentPersona
+    });
+  };
+
+  const appendChatBubble = (who, html) => {
     const chatMsgArea = document.getElementById('ai-chat-messages');
+    if (!chatMsgArea) return;
+    const row = document.createElement('div');
+    row.className = `chat-bubble-row ${who}`;
+    row.innerHTML = who === 'ai'
+      ? `<div class="bubble-avatar">릴리</div><div class="bubble-content">${html}</div>`
+      : `<div class="bubble-content">${html}</div>`;
+    chatMsgArea.appendChild(row);
+    chatMsgArea.scrollTop = chatMsgArea.scrollHeight;
+  };
+
+  const renderAiChatStep = () => {
     const chipsBox = document.getElementById('ai-quick-chips');
-    if (!chatMsgArea || !chipsBox) return;
+    if (!chipsBox) return;
 
     if (state.aiStep >= aiSteps.length) {
       finishAiDiagnosis();
@@ -1232,18 +1546,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const step = aiSteps[state.aiStep];
+    appendChatBubble('ai', step.msg(state.diagnosisAnswers));
 
-    // AI 메시지 추가
-    const aiRow = document.createElement('div');
-    aiRow.className = 'chat-bubble-row ai';
-    aiRow.innerHTML = `
-      <div class="bubble-avatar">AI</div>
-      <div class="bubble-content">${step.msg}</div>
-    `;
-    chatMsgArea.appendChild(aiRow);
-    chatMsgArea.scrollTop = chatMsgArea.scrollHeight;
-
-    // 칩 생성
     chipsBox.innerHTML = '';
     step.options.forEach(opt => {
       const chip = document.createElement('button');
@@ -1255,71 +1559,116 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const handleAiUserAnswer = (text, val) => {
-    const chatMsgArea = document.getElementById('ai-chat-messages');
-    const userRow = document.createElement('div');
-    userRow.className = 'chat-bubble-row user';
-    userRow.innerHTML = `<div class="bubble-content">${text}</div>`;
-    chatMsgArea.appendChild(userRow);
-    chatMsgArea.scrollTop = chatMsgArea.scrollHeight;
+    const step = aiSteps[state.aiStep];
+    if (!step) return;
 
+    appendChatBubble('user', escapeHtml(text));
     document.getElementById('ai-quick-chips').innerHTML = '';
 
-    // 실시간 아바타 모핑 시각화
-    updateMorphingAvatar(val);
+    state.diagnosisAnswers[step.key] = val;
+    updateMorphingAvatar(step.key, val);
 
     state.aiStep++;
     setTimeout(renderAiChatStep, 500);
   };
 
-  const updateMorphingAvatar = (val) => {
+  // 자유 입력·음성은 현재 질문의 보기 키워드와 맞을 때만 응답으로 인정한다
+  const handleFreeTextAnswer = (text) => {
+    const step = aiSteps[state.aiStep];
+    if (!step) {
+      appendChatBubble('user', escapeHtml(text));
+      appendChatBubble('ai', "문진이 끝났어요. 새로 하시려면 상단의 <strong>'다시 진단하기'</strong>를 눌러주세요.");
+      return;
+    }
+    const matched = step.options.find(opt => opt.keywords.some(k => text.includes(k)));
+    if (matched) {
+      handleAiUserAnswer(text, matched.val);
+      return;
+    }
+    appendChatBubble('user', escapeHtml(text));
+    appendChatBubble('ai', 'MVP 버전에서는 자유 문장을 이해하는 AI가 아직 연결되지 않았어요. 아래 보기 중 하나를 눌러 주시거나, 보기에 있는 단어로 짧게 답해주세요.');
+  };
+
+  const SHAPE_PATHS = {
+    '웨이브': {
+      torso: 'M68,102 Q100,99 132,102 L124,170 Q100,174 76,170 Z',
+      pelvis: 'M76,170 Q100,174 124,170 L142,215 Q100,222 58,215 Z',
+      label: '웨이브 (하체 곡선)'
+    },
+    '스트레이트': {
+      torso: 'M58,100 Q100,96 142,100 L132,165 Q100,167 68,165 Z',
+      pelvis: 'M68,165 Q100,167 132,165 L132,210 Q100,214 68,210 Z',
+      label: '스트레이트 (상체 볼륨)'
+    },
+    '내추럴': {
+      torso: 'M60,101 Q100,97 140,101 L130,166 Q100,169 70,166 Z',
+      pelvis: 'M70,166 Q100,169 130,166 L138,211 Q100,216 62,211 Z',
+      label: '내추럴 (프레임 강조)'
+    }
+  };
+
+  const updateMorphingAvatar = (key, val) => {
     const skinStop1 = document.getElementById('skin-stop-1');
     const skinStop2 = document.getElementById('skin-stop-2');
     const liveToneVal = document.getElementById('live-tone-val');
     const liveShapeVal = document.getElementById('live-shape-val');
-    const morphTorso = document.getElementById('morph-torso');
-    const morphPelvis = document.getElementById('morph-pelvis');
+    const liveJewelVal = document.getElementById('live-jewel-val');
 
-    if (val === 'cool') {
-      skinStop1?.setAttribute('stop-color', '#fff0ea');
-      skinStop2?.setAttribute('stop-color', '#eed2cb');
-      if (liveToneVal) liveToneVal.textContent = '여름 쿨 뮤트 (청량)';
-    } else if (val === 'warm') {
-      skinStop1?.setAttribute('stop-color', '#fef3c7');
-      skinStop2?.setAttribute('stop-color', '#fde68a');
-      if (liveToneVal) liveToneVal.textContent = '가을 웜 (온화)';
-    } else if (val === 'wave') {
-      morphTorso?.setAttribute('d', 'M68,102 Q100,99 132,102 L124,170 Q100,174 76,170 Z');
-      morphPelvis?.setAttribute('d', 'M76,170 Q100,174 124,170 L142,215 Q100,222 58,215 Z');
-      if (liveShapeVal) liveShapeVal.textContent = '웨이브 골격 (하체 곡선)';
-    } else if (val === 'straight') {
-      morphTorso?.setAttribute('d', 'M58,100 Q100,96 142,100 L132,165 Q100,167 68,165 Z');
-      morphPelvis?.setAttribute('d', 'M68,165 Q100,167 132,165 L132,210 Q100,214 68,210 Z');
-      if (liveShapeVal) liveShapeVal.textContent = '스트레이트 (상체 볼륨)';
+    if (key === 'tone') {
+      const isCool = val === 'cool';
+      skinStop1?.setAttribute('stop-color', isCool ? '#fff0ea' : '#fef3c7');
+      skinStop2?.setAttribute('stop-color', isCool ? '#eed2cb' : '#fde68a');
+      if (liveJewelVal) liveJewelVal.textContent = isCool ? '실버·화이트골드' : '옐로우골드';
+      return;
+    }
+    if (key === 'metal' || key === 'sunburn') {
+      const { cool, warm } = tallyUndertone(state.diagnosisAnswers);
+      if (cool === warm) {
+        if (liveToneVal) liveToneVal.textContent = `판단 보류 (쿨 ${cool} · 웜 ${warm})`;
+        return;
+      }
+      const isCool = cool > warm;
+      updateMorphingAvatar('tone', isCool ? 'cool' : 'warm');
+      if (liveToneVal) liveToneVal.textContent = `${isCool ? '쿨' : '웜'} 쪽 응답 우세 (쿨 ${cool} · 웜 ${warm})`;
+      return;
+    }
+    if (key === 'body') {
+      const shape = SHAPE_PATHS[val];
+      if (!shape) return;
+      document.getElementById('morph-torso')?.setAttribute('d', shape.torso);
+      document.getElementById('morph-pelvis')?.setAttribute('d', shape.pelvis);
+      if (liveShapeVal) liveShapeVal.textContent = shape.label;
     }
   };
 
   const finishAiDiagnosis = () => {
-    const chatMsgArea = document.getElementById('ai-chat-messages');
-    const aiRow = document.createElement('div');
-    aiRow.className = 'chat-bubble-row ai';
-    aiRow.innerHTML = `
-      <div class="bubble-avatar">AI</div>
-      <div class="bubble-content">
-        🎉 <strong>모든 진단이 완료되었습니다!</strong><br>
-        고객님의 체형(웨이브)과 퍼스널컬러(여름 쿨 뮤트)에 맞춘 <strong>상세 솔루션 리포트와 머리부터 발끝까지의 풀착장 쇼룸</strong>이 아래에 펼쳐졌습니다.
-      </div>
-    `;
-    chatMsgArea.appendChild(aiRow);
+    const result = computeDiagnosis(state.diagnosisAnswers);
+    state.diagnosis = {
+      completed: true,
+      source: 'answers',
+      body: result.body,
+      tally: result.tally
+    };
+    changeDiagnosisPersona(result.personaKey);
+    saveDiagnosis();
+
+    const p = state.personas[result.personaKey];
+    const { cool, warm, tie } = result.tally;
+    appendChatBubble('ai', `
+      📋 <strong>응답 집계가 끝났어요!</strong><br>
+      쿨 쪽 응답 ${cool}개 · 웜 쪽 응답 ${warm}개${tie ? ' (동점이라 햇볕 반응 응답을 기준으로 판단)' : ''},
+      컬러 명도 응답: ${state.diagnosisAnswers.contrast === 'deep' ? '진하고 선명한 쪽' : '밝고 부드러운 쪽'}<br>
+      → <strong>${p.toneName}</strong> · <strong>${result.body} 체형</strong><br>
+      결과가 다르게 느껴지면 결과 화면에서 <strong>직접 수정</strong>할 수 있어요.
+    `);
 
     const resultArea = document.getElementById('ai-result-area');
     if (resultArea) {
       resultArea.style.display = 'block';
-      renderCuratedShowroom();
       resultArea.scrollIntoView({ behavior: 'smooth' });
     }
-    showToast('sale', 'AI 진단 완료', '고객님을 위한 여름 쿨톤 & 웨이브 전용 쇼룸이 열렸습니다.');
-    
-    // 진단 결과 모달 즉시 팝업 오픈
+    showToast('sale', 'MVP 스타일 분석 결과가 생성되었습니다', `자가응답 기준: ${p.toneName} · ${result.body} 체형`);
+
     setTimeout(() => {
       openDiagnosisResultModal();
     }, 500);
@@ -1327,20 +1676,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.resetAiChat = () => {
     state.aiStep = 0;
+    state.diagnosisAnswers = { metal: null, sunburn: null, contrast: null, body: null, neckline: null };
     const chatMsgArea = document.getElementById('ai-chat-messages');
     if (chatMsgArea) chatMsgArea.innerHTML = '';
+    ['live-tone-val', 'live-shape-val', 'live-jewel-val'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '응답 대기중';
+    });
     renderAiChatStep();
   };
 
-  document.getElementById('ai-send-btn')?.addEventListener('click', () => {
+  const submitAiInput = () => {
     const input = document.getElementById('ai-user-input');
-    if (input.value.trim()) {
-      handleAiUserAnswer(input.value.trim(), 'cool');
-      input.value = '';
-    }
+    const text = input.value.trim();
+    if (!text) return;
+    handleFreeTextAnswer(text);
+    input.value = '';
+  };
+  document.getElementById('ai-send-btn')?.addEventListener('click', submitAiInput);
+  document.getElementById('ai-user-input')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.isComposing) submitAiInput();
   });
 
-  // 음성인식 (바이브 보이스) 연동
+  // 음성인식 (브라우저 내장 Web Speech API) → 보기 키워드 매칭
   const initAiMic = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const micBtn = document.getElementById('ai-mic-btn');
@@ -1358,8 +1716,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     state.recognition.onresult = (e) => {
-      const text = e.results[0][0].transcript;
-      handleAiUserAnswer(text, text.includes('골드') ? 'warm' : 'cool');
+      handleFreeTextAnswer(e.results[0][0].transcript);
     };
 
     state.recognition.onend = () => {
@@ -1386,95 +1743,83 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('ai-photo-wrapper').style.display = mode === 'photo' ? 'block' : 'none';
   };
 
-  window.simulatePhotoPick = (type) => {
-    const el = document.getElementById(`${type}-photo-status`);
-    if (el) el.innerHTML = '<span style="color:#03c75a;">✔ 사진 등록 완료</span>';
-    const scanBtn = document.getElementById('run-photo-scan-btn');
-    if (scanBtn) scanBtn.disabled = false;
-    showToast('info', '사진 등록 완료', `${type === 'face' ? '얼굴' : '전신'} 사진이 등록되었습니다. 'AI 정밀 비전 스캔 실행' 버튼을 누르시면 진단서가 생성됩니다.`);
+  // 사진은 현재 미리보기 + 향후 AI 분석을 위한 입력으로만 사용 (결과에 영향 없음)
+  const registerStylePhoto = (target, dataUrl) => {
+    state.photoInputs[target] = dataUrl;
+    const label = target === 'face' ? '얼굴' : '전신';
+    const statusEl = document.getElementById(`${target}-photo-status`);
+    if (statusEl) statusEl.innerHTML = `<span style="color:#03c75a;">✔ ${label} 사진 등록됨 (미리보기)</span>`;
+    const preview = document.getElementById(`${target}-photo-preview`);
+    if (preview) {
+      preview.src = dataUrl;
+      preview.style.display = 'block';
+    }
+    const icon = document.getElementById(`${target}-photo-icon`);
+    if (icon) icon.style.display = 'none';
+    showToast('info', `${label} 사진 등록 완료`, '사진은 미리보기로만 사용되며, 사진 기반 AI 분석은 개발 예정입니다. 결과는 자가응답으로 만들어집니다.');
   };
 
   window.executePhotoScan = () => {
-    const scanBtn = document.getElementById('run-photo-scan-btn');
-    if (scanBtn) {
-      scanBtn.textContent = '⚡ 비전 딥스캔 분석 중... (조도 보정 및 랜드마크 추출)';
-      scanBtn.disabled = true;
+    if (!state.diagnosis.completed) {
+      showToast('info', '자가응답 문진을 먼저 완료해주세요', '현재 MVP는 사진이 아닌 자가응답으로 스타일을 분석합니다. 5가지 질문에 답하면 결과를 볼 수 있어요.');
+      setAiMode('chat');
+      document.getElementById('ai-chat-wrapper')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
     }
-    showToast('info', 'AI 딥스캔 시작', '얼굴 랜드마크 추출 및 피부 Lab 색소 분석을 진행하고 있습니다...');
-
-    setTimeout(() => {
-      if (scanBtn) {
-        scanBtn.textContent = '✔ 분석 완료!';
-        scanBtn.disabled = false;
-      }
-      
-      // 랜덤하게 다른 페르소나를 매칭하여 동적 분석 시연 (봄 웜 또는 가을 웜 또는 겨울 쿨)
-      const personaKeys = ['spring_warm_straight', 'summer_cool_wave', 'autumn_warm_natural', 'winter_cool_straight'];
-      const nextKey = personaKeys[Math.floor(Math.random() * personaKeys.length)];
-      changeDiagnosisPersona(nextKey);
-
-      showToast('sale', '🎉 비전 분석 완료!', `'${state.personas[nextKey].toneName} & ${state.personas[nextKey].bodyName}' 진단서가 실시간 갱신되었습니다.`);
-      openDiagnosisResultModal(state.lastCapturedPhotoUrl);
-    }, 1200);
+    openDiagnosisResultModal();
   };
 
   // =========================================================================
-  // 7-0. 신상 정보(성별/연령대/실측스펙) 제어 엔진
+  // 7-0. 신상 정보(성별/연령대/실측스펙) 제어
   // =========================================================================
-  window.setUserGender = (gender) => {
-    state.userProfile.gender = gender;
-    
-    // 버튼 UI 클래스 동기화 (male/female)
+  const syncProfileControls = () => {
+    const { gender, ageGroup, height, weight } = state.userProfile;
     document.querySelectorAll('.gender-btn.male, .modal-sync-male').forEach(btn => {
       btn.classList.toggle('active', gender === 'male');
     });
     document.querySelectorAll('.gender-btn.female, .modal-sync-female').forEach(btn => {
       btn.classList.toggle('active', gender === 'female');
     });
-
-    // 기본 체형 스펙 동기화 (남성: 177cm/72kg, 여성: 164cm/49kg)
+    ['20s', '30s', '40s'].forEach(a => {
+      document.querySelectorAll(`.age-chip-btn[data-age="${a}"], .modal-sync-age-${a}`).forEach(btn => {
+        btn.classList.toggle('active', ageGroup === a);
+      });
+    });
     const hInput = document.getElementById('input-user-height');
     const wInput = document.getElementById('input-user-weight');
-    if (gender === 'male') {
-      if (hInput) hInput.value = '177';
-      if (wInput) wInput.value = '72';
-      state.userProfile.height = 177;
-      state.userProfile.weight = 72;
-    } else {
-      if (hInput) hInput.value = '164';
-      if (wInput) wInput.value = '49';
-      state.userProfile.height = 164;
-      state.userProfile.weight = 49;
-    }
+    if (hInput) hInput.value = height || '';
+    if (wInput) wInput.value = weight || '';
+  };
 
+  window.setUserGender = (gender) => {
+    state.userProfile.gender = gender;
+    saveProfile();
+    syncProfileControls();
     updateProfileNoticeText();
     changeDiagnosisPersona(state.currentPersona);
-    showToast('info', '성별 타겟팅 변경', `${gender === 'male' ? '남성 (MEN)' : '여성 (WOMEN)'} 전용 핏 및 브랜드 큐레이션으로 전환되었습니다.`);
+    showToast('info', '성별 설정 변경', `${gender === 'male' ? '남성 (MEN)' : '여성 (WOMEN)'} 기준 예시 상품으로 전환되었습니다.`);
   };
 
   window.setUserAgeGroup = (age) => {
     state.userProfile.ageGroup = age;
-    
-    // 연령대 칩 UI 동기화
-    ['20s', '30s', '40s'].forEach(a => {
-      document.querySelectorAll(`.age-chip-btn[data-age="${a}"], .modal-sync-age-${a}`).forEach(btn => {
-        btn.classList.toggle('active', age === a);
-      });
-    });
-
+    saveProfile();
+    syncProfileControls();
     updateProfileNoticeText();
     changeDiagnosisPersona(state.currentPersona);
-    showToast('info', '연령대 타겟팅 변경', `${age === '20s' ? '20대 트렌디' : age === '30s' ? '30대 컨템포러리 오피스' : '40대+ 클래식 프리미엄'} 스타일로 재편성되었습니다.`);
+    showToast('info', '연령대 설정 변경', `${age === '20s' ? '20대 트렌디' : age === '30s' ? '30대 컨템포러리 오피스' : '40대+ 클래식 프리미엄'} 스타일 기준으로 안내합니다.`);
   };
 
   window.updateUserSpecs = () => {
     const hInput = document.getElementById('input-user-height');
     const wInput = document.getElementById('input-user-weight');
-    if (hInput) state.userProfile.height = parseInt(hInput.value) || 165;
-    if (wInput) state.userProfile.weight = parseInt(wInput.value) || 55;
+    const h = parseInt(hInput?.value, 10);
+    const w = parseInt(wInput?.value, 10);
+    if (h >= 130 && h <= 200) state.userProfile.height = h;
+    state.userProfile.weight = w > 0 ? w : null;
+    saveProfile();
     updateProfileNoticeText();
-    renderCuratedShowroom();
-    renderModalCuratedItems();
+    renderHeroProfile();
+    renderFeed();
   };
 
   const updateProfileNoticeText = () => {
@@ -1509,151 +1854,162 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    notice.innerHTML = `💡 <strong>${isMale ? '남성' : '여성'} ${age === '20s' ? '20대' : age === '30s' ? '30대' : '40대+'}</strong> (${state.userProfile.height}cm / ${state.userProfile.weight}kg) 맞춤: <strong>${styleText}</strong> (${brandText}) 중심으로 큐레이션됩니다.`;
+    const { height, weight } = state.userProfile;
+    notice.innerHTML = `💡 MVP 추천 규칙: <strong>${isMale ? '남성' : '여성'} ${ageLabelOf(age)}</strong> (${height}cm${weight ? ` / ${weight}kg` : ''}) 기준 <strong>${styleText}</strong> 방향으로 안내합니다. (참고 브랜드 예시: ${brandText})`;
   };
 
   // =========================================================================
-  // 7-1. 동적 페르소나 전환 엔진 (Tone & Body Type Dynamic Engine)
+  // 7-1. 분석 결과 렌더링 (퍼스널컬러 페르소나 + 체형을 따로 조합)
   // =========================================================================
-  window.changeDiagnosisPersona = (personaKey, customSkinData) => {
-    if (!state.personas[personaKey]) return;
-    state.currentPersona = personaKey;
-    const p = state.personas[personaKey];
-    const isMale = state.userProfile.gender === 'male';
-    const ageLabel = state.userProfile.ageGroup === '20s' ? '20대' : state.userProfile.ageGroup === '30s' ? '30대' : '40대+';
-    const profilePrefix = `${ageLabel} ${isMale ? '남성' : '여성'}`;
+  const answeredCount = () => Object.values(state.diagnosisAnswers).filter(Boolean).length;
 
-    // 1. 활성 칩 버튼 상태 갱신
-    document.querySelectorAll('.persona-chip').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.persona === personaKey);
+  const basisHtml = () => {
+    const d = state.diagnosis;
+    const parts = [];
+    if (d.completed) {
+      const { cool, warm, tie } = d.tally;
+      parts.push(`<span>근거: 자가응답 ${answeredCount()}/${aiSteps.length}개</span>`);
+      parts.push(`<span>• 쿨 응답 ${cool} · 웜 응답 ${warm}${tie ? ' (동점 → 햇볕 반응 기준)' : ''}</span>`);
+      parts.push(`<span>• 컬러 명도: ${state.diagnosisAnswers.contrast === 'deep' ? '진하고 선명한 쪽' : '밝고 부드러운 쪽'}</span>`);
+      parts.push(`<span>• 체형 응답: ${escapeHtml(state.diagnosisAnswers.body || '-')}</span>`);
+    } else if (d.source !== 'manual') {
+      parts.push('<span>아직 자가응답 문진 전이에요. 기본 예시(여름 쿨톤 · 웨이브)로 표시 중입니다.</span>');
+    }
+    if (d.source === 'manual') parts.push('<span>• 사용자가 결과를 직접 수정함</span>');
+    parts.push('<span class="basis-muted">• 사진 기반 측정: 개발 예정</span>');
+    return parts.join('');
+  };
+
+  const resultStatusText = () => {
+    if (state.diagnosis.source === 'manual') return '직접 수정한 MVP 스타일 분석 결과';
+    if (state.diagnosis.completed) return 'MVP 스타일 분석 결과가 생성되었습니다';
+    return '문진 전 · 기본 예시 결과';
+  };
+
+  const renderDiagnosisResult = () => {
+    const key = state.currentPersona;
+    const p = state.personas[key];
+    const bodyKey = state.diagnosis.body;
+    const b = state.personas[BODY_PERSONA[bodyKey]] || p;
+    const profilePrefix = `${ageLabelOf(state.userProfile.ageGroup)} ${state.userProfile.gender === 'male' ? '남성' : '여성'}`;
+    const bodyWords = b.bodyTags.map(t => t.replace('#', '')).join(' · ');
+    const summary = `${TONE_SUMMARY[key]} 체형은 ${bodyWords} 조합을 추천해요.`;
+    const necklineNote = state.diagnosisAnswers.neckline === 'open'
+      ? ' (응답: 쇄골이 드러나는 넥라인 선호)'
+      : state.diagnosisAnswers.neckline === 'closed' ? ' (응답: 단정하게 채우는 넥라인 선호)' : '';
+    const paletteHtml = p.paletteDots.map(dot => `<span style="background: ${dot.color};" title="${dot.name}"></span>`).join('');
+    const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+    const setHtml = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+
+    // 수정 칩 활성 상태
+    document.querySelectorAll('.persona-chip[data-persona]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.persona === key);
+    });
+    document.querySelectorAll('.body-chip').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.body === bodyKey);
     });
 
-    // 2. 페이지 내부 결과 영역 업데이트 (#ai-result-area)
-    const pBadge = document.getElementById('page-result-badge');
-    const pTitle = document.getElementById('page-result-title');
-    const pDesc = document.getElementById('page-result-desc');
-    const pSwatch = document.getElementById('page-swatch-box');
-    const pRgb = document.getElementById('page-metrics-rgb');
-    const pLab = document.getElementById('page-metrics-lab');
-    const pTone = document.getElementById('page-metrics-tone');
+    // 페이지 내부 결과 영역 (#ai-result-area)
+    setText('page-result-badge', `자가응답 기반 퍼스널 스타일 분석 결과 · ${resultStatusText()}`);
+    setHtml('page-result-title', `<span style="color:var(--primary); font-size:14px; display:block; margin-bottom:4px;">[${profilePrefix} · MVP 추천 로직 결과]</span>고객님을 위한 <span class="highlight-blue">${p.toneName} · ${bodyKey} 체형</span> 스타일 방향`);
+    setText('page-result-desc', summary);
+    setHtml('page-vision-metrics', basisHtml());
 
-    if (pBadge) pBadge.textContent = `${profilePrefix.toUpperCase()} · ${p.badge}`;
-    if (pTitle) pTitle.innerHTML = `<span style="color:var(--primary); font-size:14px; display:block; margin-bottom:4px;">[${profilePrefix} 전용 큐레이션]</span>고객님을 위한 <span class="highlight-blue">${p.toneName} & ${p.bodyName}</span> 솔루션`;
-    if (pDesc) pDesc.textContent = p.desc;
-    if (pSwatch) pSwatch.style.background = customSkinData?.swatchBg || p.swatchBg;
-    if (pRgb) pRgb.textContent = customSkinData?.rgbStr || p.skinRgb;
-    if (pLab) pLab.textContent = customSkinData?.labStr || p.skinLab;
-    if (pTone) pTone.textContent = p.skinToneClass;
+    setText('page-card1-title', `퍼스널 컬러: ${p.toneName}`);
+    setText('page-card1-desc', TONE_SUMMARY[key]);
+    setHtml('page-palette-dots', paletteHtml);
+    setText('page-card2-title', `체형: ${b.bodyName}`);
+    setText('page-card2-desc', b.bodyDesc);
+    setHtml('page-card2-tags', b.bodyTags.map(tag => `<span>${tag}</span>`).join(' '));
+    setText('page-card3-title', `주얼리 & 넥라인: ${p.jewelTags[0]}`);
+    setText('page-card3-desc', p.jewelDesc + necklineNote);
+    setHtml('page-card3-tags', p.jewelTags.map(tag => `<span>${tag}</span>`).join(' '));
 
-    const pCard1Title = document.getElementById('page-card1-title');
-    const pCard1Desc = document.getElementById('page-card1-desc');
-    const pPalette = document.getElementById('page-palette-dots');
-    if (pCard1Title) pCard1Title.textContent = `퍼스널 컬러: ${p.toneName}`;
-    if (pCard1Desc) pCard1Desc.textContent = p.desc;
-    if (pPalette) {
-      pPalette.innerHTML = p.paletteDots.map(dot => `
-        <span style="background: ${dot.color};" title="${dot.name}"></span>
-      `).join('');
+    // 팝업 모달 (#diagnosis-result-modal)
+    setText('modal-result-status', resultStatusText());
+    setHtml('modal-result-title', `<span style="color:var(--primary); font-size:13px; display:block;">[${profilePrefix} · 자가응답 기준]</span>분석 결과: <strong style="color:var(--primary);">${p.toneName}</strong> · <strong style="color:var(--primary);">${bodyKey} 체형</strong>`);
+    setText('modal-result-desc', summary);
+    setHtml('modal-vision-metrics', basisHtml());
+    setHtml('modal-tag-pills', `
+      <span>#${profilePrefix.replace(/\s+/g, '_')}</span>
+      <span>#${p.toneName.replace(/\s+/g, '')}</span>
+      <span>#${bodyKey}체형</span>
+      <span>#${b.bodyTags[0]?.replace('#', '') || '체형맞춤'}</span>
+    `);
+    setText('modal-card1-title', `🎨 베스트 컬러 팔레트 (${p.toneName})`);
+    setText('modal-card1-desc', TONE_SUMMARY[key]);
+    setHtml('modal-palette-dots', paletteHtml);
+    setText('modal-card2-title', `👗 체형 보완 핏 공식 (${b.bodyName})`);
+    setText('modal-card2-desc', b.bodyDesc);
+    setHtml('modal-card2-tags', b.bodyTags.map(tag => `<span>${tag}</span>`).join(' '));
+    setText('modal-card3-title', `💎 넥라인 & 주얼리 (${p.jewelTags[0]})`);
+    setText('modal-card3-desc', p.jewelDesc + necklineNote);
+    setHtml('modal-card3-tags', p.jewelTags.map(tag => `<span>${tag}</span>`).join(' '));
+
+    // 일러스트 동기화 (문진을 마쳤거나 직접 수정한 경우에만)
+    if (state.diagnosis.completed || state.diagnosis.source === 'manual') {
+      updateMorphingAvatar('tone', PERSONA_TONE[key].includes('쿨') ? 'cool' : 'warm');
+      updateMorphingAvatar('body', bodyKey);
+      setText('live-tone-val', p.toneName);
     }
 
-    const pCard2Title = document.getElementById('page-card2-title');
-    const pCard2Desc = document.getElementById('page-card2-desc');
-    const pCard2Tags = document.getElementById('page-card2-tags');
-    if (pCard2Title) pCard2Title.textContent = `체형 골격: ${p.bodyName}`;
-    if (pCard2Desc) pCard2Desc.textContent = p.bodyDesc;
-    if (pCard2Tags) {
-      pCard2Tags.innerHTML = p.bodyTags.map(tag => `<span>${tag}</span>`).join(' ');
-    }
-
-    const pCard3Title = document.getElementById('page-card3-title');
-    const pCard3Desc = document.getElementById('page-card3-desc');
-    const pCard3Tags = document.getElementById('page-card3-tags');
-    if (pCard3Title) pCard3Title.textContent = `주얼리 & 넥라인: ${p.jewelTags[0]}`;
-    if (pCard3Desc) pCard3Desc.textContent = p.jewelDesc;
-    if (pCard3Tags) {
-      pCard3Tags.innerHTML = p.jewelTags.map(tag => `<span>${tag}</span>`).join(' ');
-    }
-
-    // 3. 팝업 모달 내부 영역 업데이트 (#diagnosis-result-modal)
-    const mTitle = document.getElementById('modal-result-title');
-    const mDesc = document.getElementById('modal-result-desc');
-    const mSwatch = document.getElementById('modal-swatch-box');
-    const mRgb = document.getElementById('modal-metrics-rgb');
-    const mLab = document.getElementById('modal-metrics-lab');
-    const mTags = document.getElementById('modal-tag-pills');
-
-    if (mTitle) mTitle.innerHTML = `<span style="color:var(--primary); font-size:13px; display:block;">[${profilePrefix} 맞춤 분석]</span>진단 결과: <strong style="color:var(--primary);">${p.toneName}</strong> & <strong style="color:var(--primary);">${p.bodyName}</strong>`;
-    if (mDesc) mDesc.textContent = p.desc;
-    if (mSwatch) mSwatch.style.background = customSkinData?.swatchBg || p.swatchBg;
-    if (mRgb) mRgb.textContent = customSkinData?.rgbStr || p.skinRgb;
-    if (mLab) mLab.textContent = customSkinData?.labStr || p.skinLab;
-    if (mTags) {
-      mTags.innerHTML = `
-        <span>#${profilePrefix.replace(/\s+/g, '_')}</span>
-        <span>#${p.toneName.replace(/\s+/g, '')}</span>
-        <span>#${p.bodyName.replace(/\s+/g, '')}</span>
-        <span>#${p.bodyTags[0]?.replace('#', '') || '체형맞춤'}</span>
-      `;
-    }
-
-    const mCard1Title = document.getElementById('modal-card1-title');
-    const mCard1Desc = document.getElementById('modal-card1-desc');
-    const mPalette = document.getElementById('modal-palette-dots');
-    if (mCard1Title) mCard1Title.textContent = `🎨 베스트 컬러 팔레트 (${p.toneName})`;
-    if (mCard1Desc) mCard1Desc.textContent = p.desc;
-    if (mPalette) {
-      mPalette.innerHTML = p.paletteDots.map(dot => `
-        <span style="background: ${dot.color};" title="${dot.name}"></span>
-      `).join('');
-    }
-
-    const mCard2Title = document.getElementById('modal-card2-title');
-    const mCard2Desc = document.getElementById('modal-card2-desc');
-    const mCard2Tags = document.getElementById('modal-card2-tags');
-    if (mCard2Title) mCard2Title.textContent = `👔 체형 보완 핏 공식 (${p.bodyName})`;
-    if (mCard2Desc) mCard2Desc.textContent = p.bodyDesc;
-    if (mCard2Tags) {
-      mCard2Tags.innerHTML = p.bodyTags.map(tag => `<span>${tag}</span>`).join(' ');
-    }
-
-    const mCard3Title = document.getElementById('modal-card3-title');
-    const mCard3Desc = document.getElementById('modal-card3-desc');
-    const mCard3Tags = document.getElementById('modal-card3-tags');
-    if (mCard3Title) mCard3Title.textContent = `💎 넥라인 & 주얼리 (${p.jewelTags[0]})`;
-    if (mCard3Desc) mCard3Desc.textContent = p.jewelDesc;
-    if (mCard3Tags) {
-      mCard3Tags.innerHTML = p.jewelTags.map(tag => `<span>${tag}</span>`).join(' ');
-    }
-
-    // 4. 실시간 아바타 비주얼 모핑 동기화
-    updateMorphingAvatar(p.toneName.includes('쿨') ? 'cool' : 'warm');
-    updateMorphingAvatar(p.bodyName.includes('웨이브') ? 'wave' : 'straight');
-
-    // 5. 추천 상품 쇼룸 재렌더링
     renderCuratedShowroom();
     renderModalCuratedItems();
     refreshIcons();
   };
 
+  // 퍼스널컬러(페르소나) 변경. opts.manual = 사용자가 결과를 직접 수정
+  window.changeDiagnosisPersona = (personaKey, opts = {}) => {
+    if (!state.personas[personaKey]) return;
+    state.currentPersona = personaKey;
+    if (opts.manual) {
+      state.diagnosis.source = 'manual';
+      saveDiagnosis();
+    }
+    renderDiagnosisResult();
+  };
+
+  window.setDiagnosisBody = (body) => {
+    if (!BODY_PERSONA[body]) return;
+    state.diagnosis.body = body;
+    state.diagnosis.source = 'manual';
+    saveDiagnosis();
+    renderDiagnosisResult();
+  };
+
+  window.focusResultEditor = (editorId) => {
+    const el = document.getElementById(editorId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.remove('flash');
+    void el.offsetWidth;
+    el.classList.add('flash');
+  };
+
+  // 분석 결과를 매칭 프로필 폼에 채워서 사용자가 확인 후 저장
+  window.applyDiagnosisToProfile = () => {
+    openProfileModal({
+      tone: PERSONA_TONE[state.currentPersona],
+      bodyType: state.diagnosis.body
+    });
+    showToast('info', '프로필에 반영할까요?', '퍼스널컬러·체형을 채워뒀어요. 키·사이즈를 확인하고 저장해주세요.');
+  };
+
   // =========================================================================
-  // 7-2. AI 퍼스널 진단 결과서 모달 열기 & 쇼룸 아이템 렌더링
+  // 7-2. 스타일 분석 결과 모달 열기 & 쇼룸 아이템 렌더링
   // =========================================================================
   window.openDiagnosisResultModal = (photoUrl) => {
+    const photo = photoUrl || state.photoInputs.face || state.photoInputs.body;
     const photoEl = document.getElementById('result-user-photo');
+    const emptyEl = document.getElementById('result-photo-empty');
     if (photoEl) {
-      if (photoUrl) {
-        photoEl.src = photoUrl;
-      } else if (state.lastCapturedPhotoUrl) {
-        photoEl.src = state.lastCapturedPhotoUrl;
-      } else {
-        photoEl.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
-      }
+      if (photo) photoEl.src = photo;
+      photoEl.style.display = photo ? 'block' : 'none';
     }
+    if (emptyEl) emptyEl.style.display = photo ? 'none' : 'flex';
 
-    // 현재 페르소나 데이터 반영
-    changeDiagnosisPersona(state.currentPersona);
+    renderDiagnosisResult();
 
-    // 페이지 내부 결과 쇼룸도 함께 표시
     const resultArea = document.getElementById('ai-result-area');
     if (resultArea) {
       resultArea.style.display = 'block';
@@ -1663,51 +2019,85 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshIcons();
   };
 
-  const renderModalCuratedItems = () => {
-    const grid = document.getElementById('modal-curated-items-grid');
+  // 쇼룸 카드: 예시 상품 데이터임을 명시
+  const curatedCardHtml = (item) => `
+    <div class="curated-img-wrap">
+      <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=500&q=80';">
+      <span class="curated-stock-badge sample">예시 상품</span>
+    </div>
+    <div class="curated-body">
+      <span class="curated-brand">${item.brand}</span>
+      <h5 class="curated-title">${item.title}</h5>
+      <div class="curated-fit">
+        ${item.fit}<br>
+        <strong>${item.size}</strong>
+      </div>
+      <div class="curated-footer">
+        <span class="curated-price">예시가 ₩ ${item.price.toLocaleString()}</span>
+        <button class="single-add-btn" onclick="addToCart('${item.id}')">+ 담기</button>
+      </div>
+    </div>
+  `;
+
+  const renderCuratedGrid = (gridId) => {
+    const grid = document.getElementById(gridId);
     if (!grid) return;
     grid.innerHTML = '';
-
     state.curatedItems.forEach(item => {
       const card = document.createElement('div');
       card.className = 'curated-card';
-      card.innerHTML = `
-        <div class="curated-img-wrap">
-          <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=500&q=80';">
-          ${item.stock <= 2 ? `<span class="curated-stock-badge">🚨 잔여 ${item.stock}개</span>` : ''}
-          <span style="position:absolute; bottom:8px; left:8px; background:rgba(0,0,0,0.65); color:#fff; font-size:10px; padding:2px 6px; border-radius:3px;">${item.mall || '제휴몰'}</span>
-        </div>
-        <div class="curated-body">
-          <span class="curated-brand">${item.brand}</span>
-          <h5 class="curated-title">${item.title}</h5>
-          <div class="curated-fit">
-            ${item.fit}<br>
-            <strong>${item.size}</strong>
-          </div>
-          <div class="curated-footer">
-            <span class="curated-price">₩ ${item.price.toLocaleString()}</span>
-            <button class="single-add-btn" onclick="addToCart('${item.id}')">+ 담기</button>
-          </div>
-        </div>
-      `;
+      card.innerHTML = curatedCardHtml(item);
       grid.appendChild(card);
     });
     refreshIcons();
   };
 
+  const renderModalCuratedItems = () => renderCuratedGrid('modal-curated-items-grid');
+
   // =========================================================================
-  // 7-3. 쇼핑몰 URL 직접 분석기 시뮬레이션
+  // 7-3. 상품 URL 분석 MVP (샘플 상품만 지원, 실제 웹페이지를 읽지 않음)
   // =========================================================================
-  window.setSampleUrl = (mall) => {
-    const input = document.getElementById('custom-mall-url');
-    if (!input) return;
-    if (mall === 'musinsa') {
-      input.value = 'https://www.musinsa.com/app/goods/2849102 (무신사 스탠다드 퓨어 캐시미어 브이넥 니트)';
-    } else if (mall === '29cm') {
-      input.value = 'https://www.29cm.co.kr/product/1849204 (던스트 테일러드 2버튼 싱글 울 자켓)';
-    } else if (mall === 'zara') {
-      input.value = 'https://www.zara.com/kr/ko/fluid-pants-p0790142.html (ZARA 플루이드 와이드 하이라이즈 팬츠)';
+  const SAMPLE_PRODUCTS = {
+    knit: {
+      url: 'https://sample.ootd-demo/products/cashmere-vneck-knit',
+      title: '캐시미어 브이넥 니트',
+      price: '89,900원',
+      neckline: 'V넥 (깊지 않은 V존, 목선 정돈)',
+      tones: ['봄웜톤', '가을웜톤'],
+      bodies: ['스트레이트'],
+      toneText: '봄 웜톤 · 가을 웜톤에 추천 (피치·카멜 계열)',
+      bodyText: '스트레이트 체형 추천 (상체 볼륨을 정돈하는 정핏)',
+      img: 'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=300&q=80'
+    },
+    jacket: {
+      url: 'https://sample.ootd-demo/products/tailored-single-jacket',
+      title: '테일러드 싱글 2버튼 울 자켓',
+      price: '248,000원',
+      neckline: '테일러드 라펠 & 싱글 브레스트',
+      tones: ['봄웜톤', '가을웜톤', '겨울쿨톤'],
+      bodies: ['스트레이트', '내추럴'],
+      toneText: '웜톤 · 겨울 쿨톤에 추천 (오트밀·블랙 계열)',
+      bodyText: '스트레이트 · 내추럴 체형 추천 (어깨선이 정돈된 실루엣)',
+      img: 'https://images.unsplash.com/photo-1550614000-4895a10e1bfd?auto=format&fit=crop&w=300&q=80'
+    },
+    pants: {
+      url: 'https://sample.ootd-demo/products/high-rise-wide-pants',
+      title: '하이라이즈 플리츠 와이드 팬츠',
+      price: '59,900원',
+      neckline: '하이라이즈 허리선',
+      tones: ['봄웜톤', '여름쿨톤', '가을웜톤', '겨울쿨톤'],
+      bodies: ['웨이브'],
+      toneText: '모든 톤에 무난 (차콜·블랙 모노톤)',
+      bodyText: '웨이브 체형 추천 (골반·힙 라인을 부드럽게 커버)',
+      img: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=300&q=80'
     }
+  };
+
+  window.setSampleUrl = (sampleKey) => {
+    const input = document.getElementById('custom-mall-url');
+    const sample = SAMPLE_PRODUCTS[sampleKey];
+    if (!input || !sample) return;
+    input.value = sample.url;
     analyzeCustomMallUrl();
   };
 
@@ -1718,99 +2108,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const url = input.value.trim();
     if (!url) {
-      alert('쇼핑몰 상품 링크(URL)를 입력해주세요!');
+      alert('샘플 상품 버튼을 눌러 분석 경험을 확인해보세요.');
       return;
     }
 
     resultBox.style.display = 'flex';
-    resultBox.innerHTML = `
-      <div style="text-align:center; width:100%; padding:14px; color:var(--primary); font-size:13px; font-weight:700;">
-        ⚡ 크롤러가 쇼핑몰 상세페이지 스펙 & 모델 착용 이미지를 수집하여 비전 AI로 분석하고 있습니다...
-      </div>
-    `;
-
-    setTimeout(() => {
-      let title = '파인 게이지 울 보트넥 니트';
-      let brand = 'COS';
-      let neckline = '보트넥 (가로로 긴 넥라인, 쇄골 노출)';
-      let toneFit = '여름 쿨톤 / 겨울 쿨톤 (96% 일치)';
-      let bodyFit = '웨이브 체형 최적 (상체 목선 연장 및 시선 분산 효과)';
-      let img = 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=300&q=80';
-      let price = '135,000원';
-
-      if (url.includes('무신사') || url.includes('musinsa')) {
-        title = '퓨어 캐시미어 브이넥 니트';
-        brand = '무신사 스탠다드';
-        neckline = 'V넥 (깊지 않은 V존, 바스트 부각 방지)';
-        toneFit = '봄 웜톤 / 가을 웜톤 (98% 일치)';
-        bodyFit = '스트레이트 체형 추천 (상체 볼륨 커버 슬림핏)';
-        img = 'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=300&q=80';
-        price = '89,900원';
-      } else if (url.includes('던스트') || url.includes('29cm') || url.includes('자켓')) {
-        title = '클래식 테일러드 싱글 2버튼 울 자켓';
-        brand = 'DUNST (29CM)';
-        neckline = '테일러드 라펠 & 싱글 브레스트';
-        toneFit = '웜톤 & 뉴트럴 (95% 일치)';
-        bodyFit = '스트레이트 및 내추럴 체형 강력 추천';
-        img = 'https://images.unsplash.com/photo-1550614000-4895a10e1bfd?auto=format&fit=crop&w=300&q=80';
-        price = '248,000원';
-      } else if (url.includes('zara') || url.includes('ZARA') || url.includes('팬츠')) {
-        title = '플루이드 플리츠 와이드 슬랙스';
-        brand = 'ZARA';
-        neckline = '하이라이즈 허리선 (허리 68cm 맞춤)';
-        toneFit = '전 톤 무난 (모노톤 차콜/블랙)';
-        bodyFit = '웨이브 체형 최적 (골반 및 힙라인 부드러운 커버)';
-        img = 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=300&q=80';
-        price = '59,900원';
-      }
-
+    const sample = Object.values(SAMPLE_PRODUCTS).find(s => s.url === url);
+    if (!sample) {
       resultBox.innerHTML = `
-        <img src="${img}" alt="분석 상품" class="url-res-img">
-        <div class="url-res-info">
-          <h5>[${brand}] ${title} <span style="color:var(--primary); font-size:12px; margin-left:8px;">₩ ${price}</span></h5>
-          <p><strong>• 넥라인/실루엣:</strong> ${neckline}</p>
-          <p><strong>• 퍼스널 컬러 적합도:</strong> <span style="color:var(--accent-green); font-weight:700;">${toneFit}</span></p>
-          <p><strong>• 체형 솔루션:</strong> <span style="color:var(--primary); font-weight:700;">${bodyFit}</span></p>
+        <div class="url-unsupported">
+          <i data-lucide="info"></i>
+          <p>현재 MVP에서는 샘플 상품을 이용한 분석 경험만 제공됩니다. 실제 쇼핑몰 상품 정보 연동은 제휴 및 API 구축 후 제공할 예정입니다.</p>
         </div>
       `;
-      showToast('sale', '쇼핑몰 상품 분석 완료', `[${brand}] 상품의 체형·컬러 적합도 분석이 완료되었습니다.`);
-    }, 800);
+      refreshIcons();
+      return;
+    }
+
+    const profile = state.userProfile;
+    let fitLine = '<span class="basis-muted">내 매칭 프로필을 저장하면, 내 체형·톤 기준 추천 여부도 함께 보여드려요.</span>';
+    if (profile.saved) {
+      const toneOk = !!profile.tone && sample.tones.includes(profile.tone);
+      const bodyOk = sample.bodies.includes(profile.bodyType);
+      fitLine = toneOk && bodyOk
+        ? `<span style="color:var(--accent-green); font-weight:700;">내 프로필(${toneLabel(profile.tone)} · ${profile.bodyType}) 기준 추천 규칙에 맞아요</span>`
+        : `<span style="color:var(--text-sub); font-weight:700;">내 프로필(${toneLabel(profile.tone) || '톤 미입력'} · ${profile.bodyType}) 기준으로는 ${bodyOk ? '체형은 맞지만 톤은' : toneOk ? '톤은 맞지만 체형은' : '톤·체형 모두'} 추천 규칙과 달라요</span>`;
+    }
+
+    resultBox.innerHTML = `
+      <img src="${sample.img}" alt="샘플 상품" class="url-res-img">
+      <div class="url-res-info">
+        <h5>${sample.title} <span class="sample-data-badge">예시 데이터</span> <span style="color:var(--primary); font-size:12px; margin-left:4px;">예시가 ${sample.price}</span></h5>
+        <p><strong>• 넥라인/실루엣:</strong> ${sample.neckline}</p>
+        <p><strong>• 퍼스널컬러 추천:</strong> ${sample.toneText}</p>
+        <p><strong>• 체형 추천:</strong> ${sample.bodyText}</p>
+        <p><strong>• 내 기준:</strong> ${fitLine}</p>
+      </div>
+    `;
   };
 
   // =========================================================================
   // 8. 맞춤 큐레이션 쇼룸 & 스마트 장바구니
   // =========================================================================
-  const renderCuratedShowroom = () => {
-    const grid = document.getElementById('curated-items-grid');
-    if (!grid) return;
-    grid.innerHTML = '';
-
-    state.curatedItems.forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'curated-card';
-      card.innerHTML = `
-        <div class="curated-img-wrap">
-          <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=500&q=80';">
-          ${item.stock <= 2 ? `<span class="curated-stock-badge">🚨 잔여 ${item.stock}개</span>` : ''}
-          <span style="position:absolute; bottom:8px; left:8px; background:rgba(0,0,0,0.65); color:#fff; font-size:10px; padding:2px 6px; border-radius:3px;">${item.mall || '제휴몰'}</span>
-        </div>
-        <div class="curated-body">
-          <span class="curated-brand">${item.brand}</span>
-          <h5 class="curated-title">${item.title}</h5>
-          <div class="curated-fit">
-            ${item.fit}<br>
-            <strong>${item.size}</strong>
-          </div>
-          <div class="curated-footer">
-            <span class="curated-price">₩ ${item.price.toLocaleString()}</span>
-            <button class="single-add-btn" onclick="addToCart('${item.id}')">+ 담기</button>
-          </div>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
-    refreshIcons();
-  };
+  const renderCuratedShowroom = () => renderCuratedGrid('curated-items-grid');
 
   window.addToCart = (itemId) => {
     const item = state.curatedItems.find(i => i.id === itemId);
@@ -1819,7 +2159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!state.cart.some(c => c.id === item.id)) {
       state.cart.push(item);
       updateCartBadge();
-      showToast('sale', '장바구니 담김', `[${item.brand}] ${item.title}이(가) 추가되었습니다. 24시간 가격할인·품절알림이 켜졌습니다.`);
+      showToast('sale', '장바구니 담김', `[${item.brand}] ${item.title}을(를) 담았어요. 향후 가격·품절 알림을 받을 수 있습니다. (현재는 기능 데모)`);
     } else {
       showToast('info', '알림', '이미 장바구니에 보관 중인 아이템입니다.');
     }
@@ -1832,7 +2172,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
     updateCartBadge();
-    showToast('sale', '풀착장 5종 담기 완료', '가격 하락 및 품절 임박 24시간 스마트 트래커가 가동되었습니다.');
+    showToast('sale', '풀착장 5종 담기 완료', '향후 가격·품절 알림을 받을 수 있습니다. 현재는 알림 기능 데모로, 실제 가격·재고는 확인하지 않습니다.');
     openCartDrawer();
   };
 
@@ -1852,7 +2192,7 @@ document.addEventListener('DOMContentLoaded', () => {
       listEl.innerHTML = `
         <div style="text-align:center; padding:50px 20px; color:var(--text-sub);">
           <i data-lucide="shopping-bag" style="width:40px; height:40px; margin-bottom:10px;"></i>
-          <p>장바구니가 비어 있습니다.<br>AI 맞춤 쇼룸에서 마음에 드는 상품을 담아보세요.</p>
+          <p>장바구니가 비어 있습니다.<br>맞춤 쇼룸에서 마음에 드는 예시 상품을 담아보세요.</p>
         </div>
       `;
       totalEl.textContent = '₩ 0';
@@ -1895,20 +2235,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('cart-drawer-open-btn')?.addEventListener('click', openCartDrawer);
 
-  // 시뮬레이터 테스트
+  // 가격·품절 알림 기능 데모 (실제 가격·재고를 조회하지 않는 화면 예시)
   window.simulatePriceDrop = () => {
     showToast(
       'sale',
-      '⚡ [PRICE DROP] 30% 즉시 할인 감지!',
-      '담아두신 [COS] 파인 게이지 울 보트넥 니트가 ₩135,000 ➔ ₩94,500으로 인하되었습니다.'
+      '<span class="demo-badge">DEMO</span> 세일 알림 예시',
+      '담아둔 상품의 가격이 내려가면 이렇게 알려드릴 예정이에요. (예시: ₩135,000 → ₩94,500, 실제 가격 아님)'
     );
   };
 
   window.simulateLowStock = () => {
     showToast(
       'stock',
-      '🚨 [LOW STOCK] 내 사이즈 품절 임박!',
-      '[ZARA] 플루이드 플리츠 와이드 슬랙스 (추천 M) 잔여 수량이 단 1개 남았습니다!'
+      '<span class="demo-badge">DEMO</span> 품절임박 알림 예시',
+      '내 사이즈 재고가 얼마 남지 않으면 이렇게 알려드릴 예정이에요. (예시 화면, 실제 재고 아님)'
     );
   };
 
@@ -1921,9 +2261,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (state.currentUser.isLoggedIn) {
       authBox.innerHTML = `
-        <div class="user-logged-profile" onclick="showToast('info', '마이 프로필', '${state.currentUser.nickname}님의 개인 스타일 서재')">
+        <div class="user-logged-profile" onclick="openProfileModal()" title="내 매칭 프로필 편집">
           <img src="${state.currentUser.avatar}" alt="프로필" class="user-logged-avatar">
-          <span class="user-logged-name">${state.currentUser.nickname}</span>
+          <span class="user-logged-name">${escapeHtml(state.currentUser.nickname)}</span>
         </div>
       `;
     } else {
@@ -1950,20 +2290,31 @@ document.addEventListener('DOMContentLoaded', () => {
     state.currentUser.nickname = email.split('@')[0];
     updateAuthUI();
     closeModal('auth-modal');
-    showToast('info', '로그인 완료', `${state.currentUser.nickname}님 환영합니다!`);
+    showToast('info', '로그인 완료 (데모)', `${escapeHtml(state.currentUser.nickname)}님 환영합니다! 회원 DB 연동 전이라 실제 계정 확인은 하지 않습니다.`);
   };
 
   window.doRegister = () => {
     const nick = document.getElementById('reg-nickname').value || '뉴_패셔니스타';
-    const specs = document.getElementById('reg-specs').value || '165cm · 50kg';
+    const specs = document.getElementById('reg-specs').value || '';
     const tone = document.getElementById('reg-tone').value;
 
     state.currentUser.isLoggedIn = true;
     state.currentUser.nickname = nick;
-    state.currentUser.specs = `${specs} · ${tone}`;
+
+    // 가입 시 입력한 키·퍼스널컬러는 매칭 프로필에도 반영
+    const heightMatch = specs.match(/(\d{3})\s*cm/);
+    const weightMatch = specs.match(/(\d{2,3})\s*kg/);
+    if (heightMatch) state.userProfile.height = parseInt(heightMatch[1], 10);
+    if (weightMatch) state.userProfile.weight = parseInt(weightMatch[1], 10);
+    if (tone !== '잘모름') state.userProfile.tone = tone;
+    saveProfile();
+    syncProfileControls();
+    updateProfileNoticeText();
+    renderHeroProfile();
+
     updateAuthUI();
     closeModal('auth-modal');
-    showToast('sale', '회원가입 완료', `${nick}님, OOTD 오늘의 코디 가입을 축하드립니다!`);
+    showToast('sale', '회원가입 완료 (데모)', `${escapeHtml(nick)}님 환영해요! 매칭 프로필에서 사이즈·체형도 입력해보세요.`);
   };
 
   window.doSocialLogin = (platform) => {
@@ -1980,6 +2331,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.openModal = (modalId) => {
     const modal = document.getElementById(modalId);
     if (modal) {
+      if (modalId === 'upload-modal') prefillUploadForm();
       modal.classList.add('open');
       refreshIcons();
     }
@@ -2045,7 +2397,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const titleEl = document.getElementById('camera-modal-title');
 
     if (target === 'face') {
-      titleEl.textContent = '얼굴 정면 촬영 (퍼스널컬러 진단용)';
+      titleEl.textContent = '얼굴 정면 촬영 (미리보기 · 향후 AI 분석용)';
       if (guideShape) {
         guideShape.style.borderRadius = '50%';
         guideShape.style.width = '200px';
@@ -2053,7 +2405,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (guideText) guideText.textContent = '얼굴을 원 안에 맞추고 턱 밑에 A4용지를 대주세요';
     } else if (target === 'body') {
-      titleEl.textContent = '전신 실루엣 촬영 (체형 골격 진단용)';
+      titleEl.textContent = '전신 실루엣 촬영 (미리보기 · 향후 AI 분석용)';
       if (guideShape) {
         guideShape.style.borderRadius = '20px';
         guideShape.style.width = '220px';
@@ -2182,39 +2534,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-    state.lastCapturedPhotoUrl = dataUrl;
 
-    // 실제 캔버스 중심부 피부 픽셀 색상 샘플링 (컴퓨터 비전 색소 분석)
-    let r = 232, g = 209, b = 197;
-    try {
-      const centerX = Math.floor(canvas.width / 2);
-      const centerY = Math.floor(canvas.height / 2);
-      const pixel = ctx.getImageData(centerX, centerY, 1, 1).data;
-      if (pixel && pixel[3] > 0) {
-        r = pixel[0];
-        g = pixel[1];
-        b = pixel[2];
-      }
-    } catch (e) {
-      console.warn('Canvas pixel read error:', e);
-    }
-
-    const brightness = (r + g + b) / 3;
-    const warmth = (r - b);
-
-    let detectedPersona = 'summer_cool_wave';
-    if (warmth > 18) {
-      detectedPersona = brightness > 150 ? 'spring_warm_straight' : 'autumn_warm_natural';
-    } else {
-      detectedPersona = brightness > 140 ? 'summer_cool_wave' : 'winter_cool_straight';
-    }
-
-    const skinData = {
-      rgbStr: `RGB(${r}, ${g}, ${b})`,
-      labStr: `Lab(${Math.round(brightness / 2.55)}, ${Math.round((r - g) * 0.4)}, ${Math.round((g - b) * 0.4)})`,
-      swatchBg: `rgb(${r}, ${g}, ${b})`
-    };
-
+    // 촬영 사진은 미리보기로만 사용한다 (픽셀 색으로 퍼스널컬러를 판정하지 않음)
     if (state.camera.target === 'ootd') {
       document.getElementById('post-img-url').value = dataUrl;
       const previewImg = document.getElementById('post-preview-img');
@@ -2223,26 +2544,8 @@ document.addEventListener('DOMContentLoaded', () => {
       openModal('upload-modal');
       showToast('sale', '촬영 완료!', '방금 찍은 사진이 코디 자랑에 적용되었습니다. 내용을 작성하고 등록해보세요.');
     } else if (state.camera.target === 'face' || state.camera.target === 'body') {
-      const isFace = state.camera.target === 'face';
-      const statusEl = document.getElementById(`${state.camera.target}-photo-status`);
-      if (statusEl) {
-        statusEl.innerHTML = `<span style="color:#03c75a; font-weight:700;">✔ ${isFace ? '얼굴' : '전신'} 촬영 & 딥스캔 완료 (${skinData.rgbStr})</span>`;
-      }
-      const scanBtn = document.getElementById('run-photo-scan-btn');
-      if (scanBtn) scanBtn.disabled = false;
-
       closeCameraViewfinder();
-
-      // 감지된 페르소나 및 실측 피부색 적용
-      changeDiagnosisPersona(detectedPersona, skinData);
-
-      // 즉시 딥스캔 분석 및 결과 팝업 표시
-      showToast('info', '⚡ AI 비전 분석 완료', `실제 사진 측정값 [${skinData.rgbStr}] 기준 ➔ '${state.personas[detectedPersona].toneName} & ${state.personas[detectedPersona].bodyName}' 진단`);
-      
-      setTimeout(() => {
-        showToast('sale', '🎉 맞춤 진단서 발급!', `'${state.personas[detectedPersona].toneName}' 전용 쇼핑몰 큐레이션이 열렸습니다.`);
-        openDiagnosisResultModal(dataUrl);
-      }, 500);
+      registerStylePhoto(state.camera.target, dataUrl);
     }
   };
 
@@ -2266,9 +2569,110 @@ document.addEventListener('DOMContentLoaded', () => {
         const previewImg = document.getElementById('post-preview-img');
         if (previewImg) previewImg.src = dataUrl;
         showToast('sale', '사진 등록 완료', '앨범에서 선택한 사진이 반영되었습니다.');
+      } else {
+        registerStylePhoto(target, dataUrl);
       }
+      input.value = '';
     };
     reader.readAsDataURL(file);
+  };
+
+  // =========================================================================
+  // 11-1. 내 매칭 프로필 (나와 비슷한 사람 찾기)
+  // =========================================================================
+  const populateSizeSelects = () => {
+    document.querySelectorAll('.size-select-top').forEach(sel => {
+      sel.innerHTML = TOP_SIZES.map(([v, label]) => `<option value="${v}">${label}</option>`).join('');
+    });
+    document.querySelectorAll('.size-select-bottom').forEach(sel => {
+      sel.innerHTML = BOTTOM_SIZES.map(v => `<option value="${v}">${v} 인치</option>`).join('');
+    });
+  };
+
+  const renderHeroProfile = () => {
+    const box = document.getElementById('hero-profile-summary');
+    if (!box) return;
+    const p = state.userProfile;
+    if (!p.saved) {
+      box.innerHTML = `
+        <p class="hero-profile-empty">아직 프로필이 없어요. 키·사이즈·체형·퍼스널컬러를 입력하면 나와 비슷한 사람의 코디를 먼저 보여드려요.</p>
+        <button type="button" class="result-edit-btn" onclick="openProfileModal()"><i data-lucide="plus"></i> 프로필 만들기</button>
+      `;
+    } else {
+      box.innerHTML = `
+        <div class="fit-spec-chips">${profileChipsHtml(p)}</div>
+        ${p.styles?.length ? `<p class="hero-profile-styles">선호 스타일: ${p.styles.map(escapeHtml).join(' · ')}</p>` : ''}
+        <button type="button" class="result-edit-btn" onclick="openProfileModal()"><i data-lucide="pencil"></i> 프로필 수정</button>
+      `;
+    }
+    refreshIcons();
+  };
+
+  const setChoiceActive = (containerId, values) => {
+    document.querySelectorAll(`#${containerId} [data-value]`).forEach(btn => {
+      btn.classList.toggle('active', values.includes(btn.dataset.value));
+    });
+  };
+
+  window.openProfileModal = (overrides = {}) => {
+    const p = { ...state.userProfile, ...overrides };
+    document.getElementById('pf-height').value = p.height || '';
+    document.getElementById('pf-weight').value = p.weight || '';
+    document.getElementById('pf-top-size').value = p.topSize || 'M';
+    document.getElementById('pf-bottom-size').value = p.bottomSize || '28';
+    document.getElementById('pf-tone').value = p.tone || '';
+    setChoiceActive('pf-body-choices', [p.bodyType]);
+    setChoiceActive('pf-style-choices', p.styles || []);
+    openModal('profile-modal');
+  };
+
+  document.getElementById('pf-body-choices')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-value]');
+    if (btn) setChoiceActive('pf-body-choices', [btn.dataset.value]);
+  });
+  document.getElementById('pf-style-choices')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-value]');
+    if (btn) btn.classList.toggle('active');
+  });
+
+  window.saveProfileFromModal = () => {
+    const height = parseInt(document.getElementById('pf-height').value, 10);
+    const weight = parseInt(document.getElementById('pf-weight').value, 10);
+    if (!height || height < 130 || height > 200) {
+      alert('키를 130~200cm 사이로 입력해주세요.');
+      return;
+    }
+    const bodyBtn = document.querySelector('#pf-body-choices .active');
+
+    Object.assign(state.userProfile, {
+      height,
+      weight: weight > 0 ? weight : null,
+      topSize: document.getElementById('pf-top-size').value,
+      bottomSize: document.getElementById('pf-bottom-size').value,
+      bodyType: bodyBtn ? bodyBtn.dataset.value : '웨이브',
+      tone: document.getElementById('pf-tone').value,
+      styles: [...document.querySelectorAll('#pf-style-choices .active')].map(b => b.dataset.value)
+    });
+    saveProfile(true);
+
+    syncProfileControls();
+    updateProfileNoticeText();
+    renderHeroProfile();
+    closeModal('profile-modal');
+    closeModal('diagnosis-result-modal');
+    showToast('sale', '프로필 저장 완료', '이 브라우저에 저장했어요. 나와 비슷한 사람의 코디부터 보여드릴게요.');
+    showSimilarFeed();
+  };
+
+  // 새로고침 후에도 문진 결과 유지
+  const restoreDiagnosis = () => {
+    const saved = readStore(DIAGNOSIS_KEY);
+    if (!saved) return;
+    if (saved.answers) Object.assign(state.diagnosisAnswers, saved.answers);
+    if (saved.diagnosis) Object.assign(state.diagnosis, saved.diagnosis);
+    if (saved.personaKey && state.femalePersonas[saved.personaKey]) state.currentPersona = saved.personaKey;
+    // 완료된 문진이면 채팅을 처음부터 다시 묻지 않도록 결과 안내만 보여준다
+    if (state.diagnosis.completed) state.aiStep = aiSteps.length;
   };
 
   // =========================================================================
@@ -2280,11 +2684,21 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-view-mobile')?.classList.remove('active');
   }
 
+  loadProfile();
+  restoreDiagnosis();
+  populateSizeSelects();
+  syncProfileControls();
+  updateProfileNoticeText();
+  renderHeroProfile();
+
   renderFeed();
   renderCommunity();
-  renderAiChatStep();
-  renderCuratedShowroom();
-  renderModalCuratedItems();
+  if (state.diagnosis.completed) {
+    appendChatBubble('ai', "지난번 문진 결과가 저장되어 있어요. 상단의 <strong>'내 스타일 분석 결과 보기'</strong>로 확인하거나, <strong>'다시 진단하기'</strong>로 새로 시작할 수 있어요.");
+  } else {
+    renderAiChatStep();
+  }
+  renderDiagnosisResult();
   updateAuthUI();
   updateCartBadge();
 });
