@@ -2492,7 +2492,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Camera permission or device error:', err);
       if (guideText) {
         guideText.innerHTML = `
-          <div style="background:rgba(234,43,66,0.9); padding:8px 14px; border-radius:8px; line-height:1.4;">
+          <div style="background:rgba(15, 138, 95,0.9); padding:8px 14px; border-radius:8px; line-height:1.4;">
             ⚠️ <strong>카메라 화면이 안 보이시나요?</strong><br>
             1. 브라우저 주소창 좌측 🔒 <strong>카메라 권한을 '허용'</strong>해주세요.<br>
             2. 노트북 상단의 <strong>물리적 웹캠 덮개(슬라이더)</strong>를 열어주세요.
@@ -2526,9 +2526,9 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
     } else {
       // 카메라 가상 시뮬레이션 프레임
-      ctx.fillStyle = '#fce7f3';
+      ctx.fillStyle = '#e3f5ec';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#ea2b42';
+      ctx.fillStyle = '#0f8a5f';
       ctx.font = '24px sans-serif';
       ctx.fillText('📷 찰칵! 오늘의 코디 사진', 40, canvas.height / 2);
     }

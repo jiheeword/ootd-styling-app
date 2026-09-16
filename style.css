@@ -7,18 +7,18 @@
   --bg-sub: #f7f9fa;
   --bg-card: #ffffff;
   --border-light: #eaedef;
-  /* 시그니처 컬러: 트렌디하고 감각적인 패션 레드 (Couture Red) */
-  --primary: #ea2b42;
-  --primary-hover: #d31830;
-  --primary-light: #fff0f2;
-  --border-focus: #ea2b42;
+  /* 시그니처 컬러: 차분하고 고급스러운 에메랄드 그린 */
+  --primary: #0f8a5f;
+  --primary-hover: #0b7350;
+  --primary-light: #ebf7f2;
+  --border-focus: #0f8a5f;
   --secondary: #2f3438;
 
   --text-main: #2f3438;
   --text-sub: #828c94;
   --text-muted: #c2c8cc;
 
-  --accent-red: #ff7777;
+  --accent-red: #2fb57d;
   --accent-yellow: #ffb800;
   --accent-green: #03c75a;
 
@@ -153,7 +153,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 3px 10px rgba(234, 43, 66, 0.35);
+  box-shadow: 0 3px 10px rgba(15, 138, 95, 0.35);
 }
 
 .logo-icon-box i {
@@ -326,7 +326,7 @@ button {
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  box-shadow: 0 3px 10px rgba(234, 43, 66, 0.3);
+  box-shadow: 0 3px 10px rgba(15, 138, 95, 0.3);
   transition: var(--transition-fast);
   white-space: nowrap;
 }
@@ -663,7 +663,7 @@ body.force-mobile-mode .report-cards-grid {
 .pin-dot {
   width: 100%;
   height: 100%;
-  background: rgba(234, 43, 66, 0.95);
+  background: rgba(15, 138, 95, 0.95);
   border: 2px solid #fff;
   border-radius: 50%;
   display: block;
@@ -673,7 +673,7 @@ body.force-mobile-mode .report-cards-grid {
 
 @keyframes pulse-pin {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); box-shadow: 0 0 14px rgba(234, 43, 66, 0.8); }
+  50% { transform: scale(1.15); box-shadow: 0 0 14px rgba(15, 138, 95, 0.8); }
 }
 
 .pin-popover {
@@ -2403,7 +2403,7 @@ body.force-mobile-mode .report-cards-grid {
   background: var(--primary);
   color: #fff;
   border: none;
-  box-shadow: 0 3px 10px rgba(234, 43, 66, 0.25);
+  box-shadow: 0 3px 10px rgba(15, 138, 95, 0.25);
 }
 
 .camera-action-btn.primary:hover {
@@ -2546,7 +2546,7 @@ body.force-mobile-mode .report-cards-grid {
 .guide-circle {
   width: 180px;
   height: 240px;
-  border: 2px dashed rgba(234, 43, 66, 0.7);
+  border: 2px dashed rgba(15, 138, 95, 0.7);
   border-radius: 50%;
   animation: pulse-pin 2.5s infinite;
 }
@@ -2578,7 +2578,7 @@ body.force-mobile-mode .report-cards-grid {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 0 20px rgba(234, 43, 66, 0.5);
+  box-shadow: 0 0 20px rgba(15, 138, 95, 0.5);
   transition: transform 0.15s ease;
 }
 
@@ -2617,10 +2617,10 @@ body.force-mobile-mode .report-cards-grid {
 
 /* 스토리 바 AI 진단서 아이콘 */
 .ai-report-story .ai-report-avatar {
-  background: linear-gradient(135deg, #ea2b42 0%, #ff6b7e 100%);
+  background: linear-gradient(135deg, #0f8a5f 0%, #5cc9a0 100%);
   color: #fff;
-  border-color: #ea2b42;
-  box-shadow: 0 0 12px rgba(234, 43, 66, 0.35);
+  border-color: #0f8a5f;
+  box-shadow: 0 0 12px rgba(15, 138, 95, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2636,7 +2636,7 @@ body.force-mobile-mode .report-cards-grid {
   color: var(--primary) !important;
   border: 1.5px solid var(--primary) !important;
   font-weight: 800 !important;
-  box-shadow: 0 2px 8px rgba(234, 43, 66, 0.15);
+  box-shadow: 0 2px 8px rgba(15, 138, 95, 0.15);
   transition: var(--transition-fast);
 }
 
@@ -2736,7 +2736,7 @@ body.force-mobile-mode .report-cards-grid {
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);
-  box-shadow: 0 2px 8px rgba(234, 43, 66, 0.25);
+  box-shadow: 0 2px 8px rgba(15, 138, 95, 0.25);
 }
 
 .vision-metrics-pill {
@@ -2957,7 +2957,7 @@ body.force-mobile-mode .report-cards-grid {
 .url-analysis-result-card {
   margin-top: 20px;
   background: #fff;
-  border: 1px solid rgba(234, 43, 66, 0.3);
+  border: 1px solid rgba(15, 138, 95, 0.3);
   border-radius: var(--radius-sm);
   padding: 18px;
   display: flex;
@@ -2990,7 +2990,7 @@ body.force-mobile-mode .report-cards-grid {
    ========================================================================== */
 .profile-setting-bar {
   background: #ffffff;
-  border: 1px solid rgba(234, 43, 66, 0.15);
+  border: 1px solid rgba(15, 138, 95, 0.15);
   border-radius: var(--radius-md);
   padding: 18px 22px;
   margin-bottom: 22px;
@@ -3304,7 +3304,7 @@ body.force-mobile-mode .report-cards-grid {
   background: var(--primary);
   border-color: var(--primary);
   color: #fff;
-  box-shadow: 0 4px 14px rgba(234, 43, 66, 0.25);
+  box-shadow: 0 4px 14px rgba(15, 138, 95, 0.25);
 }
 
 .hero-btn.primary:hover {
@@ -3427,7 +3427,7 @@ body.force-mobile-mode .hero-btn {
   gap: 14px;
   flex-wrap: wrap;
   background: var(--primary-light);
-  border: 1px solid rgba(234, 43, 66, 0.18);
+  border: 1px solid rgba(15, 138, 95, 0.18);
   border-radius: var(--radius-md);
   padding: 14px 18px;
   margin: -12px 0 22px;
@@ -3492,7 +3492,7 @@ body.force-mobile-mode .hero-btn {
   font-weight: 800;
   color: var(--primary);
   background: var(--primary-light);
-  border: 1px solid rgba(234, 43, 66, 0.25);
+  border: 1px solid rgba(15, 138, 95, 0.25);
   padding: 3px 9px;
   border-radius: var(--radius-full);
 }
@@ -3697,8 +3697,8 @@ body.force-mobile-mode .fit-chip {
 }
 
 @keyframes editorFlash {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(234, 43, 66, 0); }
-  30% { box-shadow: 0 0 0 4px rgba(234, 43, 66, 0.35); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(15, 138, 95, 0); }
+  30% { box-shadow: 0 0 0 4px rgba(15, 138, 95, 0.35); }
 }
 
 .result-header-actions {
@@ -3717,7 +3717,7 @@ body.force-mobile-mode .fit-chip {
   font-weight: 700;
   color: var(--primary);
   background: #fff;
-  border: 1px solid rgba(234, 43, 66, 0.35);
+  border: 1px solid rgba(15, 138, 95, 0.35);
   border-radius: var(--radius-full);
   padding: 6px 12px;
   cursor: pointer;
