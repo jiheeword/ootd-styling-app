@@ -24,7 +24,7 @@
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="style.css?v=20260917_1">
+  <link rel="stylesheet" href="style.css?v=20260916_mvp1">
 </head>
 <body class="light-theme">
 
@@ -49,10 +49,10 @@
 
       <!-- 중앙 메인 네비게이션 -->
       <nav class="nav-menu">
-        <button class="nav-item" data-target="feed" onclick="switchNav('feed')">
+        <button class="nav-item active" data-target="feed" onclick="switchNav('feed')">
           <span>패션 자랑 (OOTD)</span>
         </button>
-        <button class="nav-item active" data-target="ai-counseling" onclick="switchNav('ai-counseling')">
+        <button class="nav-item" data-target="ai-counseling" onclick="switchNav('ai-counseling')">
           <span class="badge-ai">BETA</span>
           <span>스타일 분석·쇼룸</span>
         </button>
@@ -110,7 +110,7 @@
     <!-- =========================================================================
          VIEW 1: 패션 자랑 (OOTD 피드 - 나와 비슷한 사람의 실제 착장)
          ========================================================================= -->
-    <section id="view-feed" class="content-view" style="display: none;">
+    <section id="view-feed" class="content-view active">
 
       <!-- 메인 히어로: 서비스 핵심 가치 -->
       <div class="feed-hero">
@@ -222,7 +222,7 @@
     <!-- =========================================================================
          VIEW 2: AI 퍼스널 카운슬링 & 룩북 쇼룸 (스마트 알림)
          ========================================================================= -->
-    <section id="view-ai-counseling" class="content-view active">
+    <section id="view-ai-counseling" class="content-view" style="display: none;">
       
       <!-- AI 헤더 배너 -->
       <div class="ai-hero-banner">
@@ -1336,11 +1336,11 @@
        모바일 하단 네비게이션 바 (스마트폰 앱 경험 제공)
        ========================================================================= -->
   <nav class="mobile-bottom-nav">
-    <button class="m-nav-item" data-target="feed" onclick="switchNav('feed')">
+    <button class="m-nav-item active" data-target="feed" onclick="switchNav('feed')">
       <i data-lucide="grid"></i>
       <span>OOTD자랑</span>
     </button>
-    <button class="m-nav-item active" data-target="ai-counseling" onclick="switchNav('ai-counseling')">
+    <button class="m-nav-item" data-target="ai-counseling" onclick="switchNav('ai-counseling')">
       <i data-lucide="sparkles"></i>
       <span>스타일분석</span>
     </button>
@@ -1361,6 +1361,6 @@
     </button>
   </nav>
 
-  <script src="app.js?v=20260917_1"></script>
+  <script src="app.js?v=20260916_mvp1"></script>
 </body>
 </html>

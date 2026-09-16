@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
       specs: '164cm · 49kg · 여름쿨톤 웨이브'
     },
-    currentNav: 'ai-counseling', // 첫 화면: 스타일 분석·쇼룸
+    currentNav: 'feed',
     feedFilter: 'all',
     activeDetailPost: null,
     cart: [],
