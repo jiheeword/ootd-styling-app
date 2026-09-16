@@ -4112,3 +4112,82 @@ body.force-mobile-mode .mode-pill {
   .logo-anim-icon { animation: none; }
   .logo-anim-icon:first-child { opacity: 1; }
 }
+
+/* 모바일: 소개·제목 영역 글씨 가운데 정렬 (카드·폼·채팅·목록은 왼쪽 정렬 유지) */
+@media (max-width: 768px) {
+  .feed-hero-copy,
+  .feed-hero-profile,
+  .mall-intel-header,
+  .mvp-status-header,
+  .url-analyzer-box > p,
+  .showroom-bar {
+    text-align: center;
+  }
+  .feed-hero-actions,
+  .url-analyzer-title,
+  .showroom-bar,
+  .similar-info-bar,
+  .feed-hero-profile .fit-spec-chips,
+  .similar-info-main .fit-spec-chips {
+    justify-content: center;
+  }
+  .feed-hero-support {
+    border-left: none;
+    padding-left: 0;
+  }
+  .hero-profile-summary {
+    align-items: center;
+  }
+  .mvp-status-header {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .similar-info-main {
+    text-align: center;
+  }
+  .community-header,
+  .mvp-notice,
+  .partner-pilot-box {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+body.force-mobile-mode .feed-hero-copy,
+body.force-mobile-mode .feed-hero-profile,
+body.force-mobile-mode .mall-intel-header,
+body.force-mobile-mode .mvp-status-header,
+body.force-mobile-mode .url-analyzer-box > p,
+body.force-mobile-mode .showroom-bar {
+  text-align: center;
+}
+body.force-mobile-mode .feed-hero-actions,
+body.force-mobile-mode .url-analyzer-title,
+body.force-mobile-mode .showroom-bar,
+body.force-mobile-mode .similar-info-bar,
+body.force-mobile-mode .feed-hero-profile .fit-spec-chips,
+body.force-mobile-mode .similar-info-main .fit-spec-chips {
+  justify-content: center;
+}
+body.force-mobile-mode .feed-hero-support {
+  border-left: none;
+  padding-left: 0;
+}
+body.force-mobile-mode .hero-profile-summary {
+  align-items: center;
+}
+body.force-mobile-mode .mvp-status-header {
+  margin-left: auto;
+  margin-right: auto;
+}
+body.force-mobile-mode .similar-info-main {
+  text-align: center;
+}
+body.force-mobile-mode .community-header,
+body.force-mobile-mode .mvp-notice,
+body.force-mobile-mode .partner-pilot-box {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
